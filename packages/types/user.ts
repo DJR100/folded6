@@ -28,6 +28,12 @@ export interface User {
   streak: {
     start: number; // Timestamp
   };
+  dailyChallenge: {
+    streakCount: number;
+    lastCompletedDate: string | null; // ISO string, device TZ - null if never completed
+    currentWeek: boolean[]; // Array[7] of Mon-Sun completion flags
+    currentDayState: "pending" | "completed" | "skipped";
+  };
   message: string | null;
   guardian: {
     guardianId: string | null;
