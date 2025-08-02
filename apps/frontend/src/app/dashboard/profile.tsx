@@ -5,9 +5,12 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { DashboardLayout } from "@/components/layouts/dashboard";
 import { ProfileEditModal } from "@/components/profile-edit-modal";
 import { Text, View, Button } from "@/components/ui";
+import { StreakTracker } from "@/components/daily-challenge/streak-tracker";
+import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 
 export default function Index() {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { dailyChallenge, weekProgress } = useDailyChallengeContext();
 
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
@@ -79,113 +82,12 @@ export default function Index() {
           </View>
         </View>
 
-        {/* Daily Streak Widget */}
-        <View className="mt-6 px-4">
-          {/* Header Strip */}
-          <View className="flex-row items-center justify-between">
-            {/* Left side - Fire emoji and streak text */}
-            <View className="flex-row items-center">
-              <Text className="text-lg">🔥</Text>
-              <Text className="ml-2 text-base font-medium">5-day streak!</Text>
-            </View>
-            
-            {/* Right side - Info icon aligned with Sunday label center */}
-            <View style={{ marginRight: 4 }}>
-              <AntDesign 
-                name="infocirlceo" 
-                size={16} 
-                color="white"
-                style={{ opacity: 0.6 }}
-              />
-            </View>
-          </View>
-
-          {/* Day-by-Day Tracker Row */}
-          <View className="mt-4">
-            <View className="relative">
-              {/* Day Labels Row */}
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>M</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>TU</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>W</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>TH</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#F97316' }}>F</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>SA</Text>
-                <Text className="text-xs text-center w-6" style={{ color: '#9CA3AF' }}>SU</Text>
-              </View>
-
-              {/* Circles Row with Progress Rail */}
-              <View className="relative">
-                {/* Progress Rail - symmetric line extending equally on both sides */}
-                <View 
-                  className="absolute"
-                  style={{ 
-                    height: 1, 
-                    backgroundColor: '#9CA3AF',
-                    top: 11, // Center of 24px circles (12px from top)
-                    left: -12, // Extend left by half circle width
-                    right: -12, // Extend right by half circle width
-                  }}
-                />
-
-                {/* Seven Day Circles - perfectly aligned under labels */}
-                <View className="flex-row justify-between">
-                  {/* Monday */}
-                  <View 
-                    className="w-6 h-6 rounded-full items-center justify-center"
-                    style={{ backgroundColor: '#3DF08B' }}
-                  >
-                    <AntDesign name="check" size={12} color="white" />
-                  </View>
-
-                  {/* Tuesday */}
-                  <View 
-                    className="w-6 h-6 rounded-full items-center justify-center"
-                    style={{ backgroundColor: '#3DF08B' }}
-                  >
-                    <AntDesign name="check" size={12} color="white" />
-                  </View>
-
-                  {/* Wednesday */}
-                  <View 
-                    className="w-6 h-6 rounded-full items-center justify-center"
-                    style={{ backgroundColor: '#3DF08B' }}
-                  >
-                    <AntDesign name="check" size={12} color="white" />
-                  </View>
-
-                  {/* Thursday */}
-                  <View 
-                    className="w-6 h-6 rounded-full items-center justify-center"
-                    style={{ backgroundColor: '#3DF08B' }}
-                  >
-                    <AntDesign name="check" size={12} color="white" />
-                  </View>
-
-                  {/* Friday - Current Day */}
-                  <View 
-                    className="w-6 h-6 rounded-full items-center justify-center"
-                    style={{ backgroundColor: '#3DF08B' }}
-                  >
-                    <AntDesign name="check" size={12} color="white" />
-                  </View>
-
-                  {/* Saturday */}
-                  <View 
-                    className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: '#4B5563' }}
-                  />
-
-                  {/* Sunday */}
-                  <View 
-                    className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: '#4B5563' }}
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
+        {/* Daily Streak Widget - REPLACED with modular component */}
+        <StreakTracker
+          streakCount={dailyChallenge.streakCount}
+          weekProgress={weekProgress}
+          className="mt-6 px-4"
+        />
       </View>
 
       {/* Use the existing ProfileEditModal component */}
