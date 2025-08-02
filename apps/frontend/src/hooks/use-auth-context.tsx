@@ -16,6 +16,7 @@ import {
 } from "react";
 
 import { app, db } from "@/lib/firebase";
+import { DailyChallengeData } from "@folded/types";
 
 export const auth = initializeAuth(app);
 
@@ -107,6 +108,35 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!user) return;
 
+    // Async function to handle daily challenge migration
+    const migrateDailyChallengeData = async () => {
+      if (!auth.currentUser?.uid) return;
+
+      // Check if user already has dailyChallenge data
+      if (!user.dailyChallenge) {
+        console.log("🔄 Migrating user to include daily challenge data...");
+        
+        // Create default daily challenge data
+        const defaultDailyChallengeData: DailyChallengeData = {
+          streakCount: 0,
+          lastCompletedDate: null,
+          currentWeek: [false, false, false, false, false, false, false], // Mon-Sun
+          currentDayState: "pending"
+        };
+
+        // Update user document with new daily challenge data
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          {
+            ...user,
+            dailyChallenge: defaultDailyChallengeData
+          }
+        );
+
+        console.log("✅ Daily challenge migration completed");
+      }
+    };
+
     console.log("🔄 Syncing local state with database state...");
     console.log("User tier from database:", user.tier);
 
@@ -123,12 +153,15 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
       setPostOnboarding("DONE");
     }
 
-    // ✅ STEP 2: Initialize bank connection state (COMMENTED OUT FOR V1)
+    // ✅ STEP 2: Migrate daily challenge data for existing users
+    migrateDailyChallengeData();
+
+    // ✅ STEP 3: Initialize bank connection state (COMMENTED OUT FOR V1)
     // const hasBankConnection = !!user.banking?.accessToken;
     // console.log("Bank connection status from database:", hasBankConnection);
     // setBankConnected(hasBankConnection);
 
-    // ✅ STEP 3: Set up real-time listener for ongoing updates
+    // ✅ STEP 4: Set up real-time listener for ongoing updates
     const snapshotListener = onSnapshot(
       doc(db, "users", auth.currentUser?.uid ?? ""),
       (doc) => {
