@@ -9,7 +9,7 @@ interface CongratulationsProps {
 
 export function Congratulations({ onClose }: CongratulationsProps) {
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 bg-background">
       {/* Main Content Card with Purple Background */}
       <View className="flex-1 px-4">
         <View 

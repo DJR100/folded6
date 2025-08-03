@@ -1,5 +1,7 @@
 import { Stack, useSegments } from "expo-router";
 import { useMemo } from "react";
+import { StatusBar, View as RNView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/colors";
 import { DailyChallengeProvider } from "@/hooks/daily-challenge-context";
@@ -9,6 +11,7 @@ import { View, Text } from "@/components/ui";
 export default function DailyChallengeLayout() {
   const segments = useSegments();
   const currentRoute = segments[segments.length - 1];
+  const insets = useSafeAreaInsets();
 
   // Determine progress based on current route
   const progress = useMemo(() => {
@@ -26,46 +29,58 @@ export default function DailyChallengeLayout() {
 
   return (
     <DailyChallengeProvider>
-      <View className="flex-1">
-        {/* Persistent Header - Folded text and fire emoji */}
-        <View className="flex-row items-center justify-between px-4">
-          <Text className="text-lg font-medium text-white ml-3">Folded</Text>
-          <Text className="text-2xl mr-3">🔥</Text>
-        </View>
-
-        {/* Persistent Progress Bar */}
-        <ProgressBar progress={progress} className="mx-4 mb-8" />
-
-        {/* Stack Navigation for Content */}
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: {
-              backgroundColor: colors.background,
-            },
-            animation: "slide_from_bottom",
+      {/* Full screen background - same grey as rest of app */}
+      <RNView style={{ flex: 1, backgroundColor: colors.background }}>
+        {/* Status Bar */}
+        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+        
+        {/* Content area with no top padding - starts right after status bar */}
+        <View 
+          className="flex-1 bg-background"
+          style={{ 
+            paddingBottom: insets.bottom, // Keep bottom safe area for home indicator
           }}
         >
-          <Stack.Screen 
-            name="intro" 
-            options={{
-              gestureEnabled: false,
+          {/* Persistent Header - Folded text and fire emoji */}
+          <View className="flex-row items-center justify-between px-4 pt-2">
+            <Text className="text-lg font-medium text-white ml-3">Folded</Text>
+            <Text className="text-2xl mr-3">🔥</Text>
+          </View>
+
+          {/* Persistent Progress Bar */}
+          <ProgressBar progress={progress} className="mx-4 mb-8" />
+
+          {/* Stack Navigation for Content */}
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: {
+                backgroundColor: colors.background, // Same background as rest of app
+              },
+              animation: "slide_from_bottom",
             }}
-          />
-          <Stack.Screen 
-            name="photo-capture"
-            options={{
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen 
-            name="congratulations"
-            options={{
-              gestureEnabled: false,
-            }}
-          />
-        </Stack>
-      </View>
+          >
+            <Stack.Screen 
+              name="intro" 
+              options={{
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen 
+              name="photo-capture"
+              options={{
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen 
+              name="congratulations"
+              options={{
+                gestureEnabled: false,
+              }}
+            />
+          </Stack>
+        </View>
+      </RNView>
     </DailyChallengeProvider>
   );
 } 

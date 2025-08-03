@@ -10,7 +10,7 @@ export function DailyChallengeIntro({
   streakCount 
 }: DailyChallengeIntroProps) {
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 bg-background">
       {/* Main Content Card - Much larger and with folded green background */}
       <View className="flex-1 px-4">
         <View 
@@ -28,12 +28,12 @@ export function DailyChallengeIntro({
         >
           {/* Left-aligned challenge texts */}
           <View className="mb-12">
-            <Text className="text-black text-lg font-medium mb-4 text-left">
+            <Text className="text-white text-lg font-medium mb-4 text-left">
               Daily Challenge
             </Text>
 
             <Text 
-              className="text-black text-2xl font-bold text-left mb-8 leading-tight"
+              className="text-white text-2xl font-bold text-left mb-8 leading-tight"
               style={{ lineHeight: 32 }}
             >
               Answer the{'\n'}following question{'\n'}today.
@@ -44,14 +44,14 @@ export function DailyChallengeIntro({
           <View className="items-center">
             {/* Countdown Timer */}
             <Text 
-              className="text-black text-4xl font-bold mb-2"
+              className="text-white text-4xl font-bold mb-2"
               style={{ fontFamily: 'monospace' }}
             >
               {timeLeft}
             </Text>
             
             <Text 
-              className="text-black text-sm mb-12 opacity-70"
+              className="text-white text-sm mb-12 opacity-70"
             >
               left to extend your {streakCount}-day streak!
             </Text>

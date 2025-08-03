@@ -2,7 +2,7 @@ import { router } from "expo-router";
 
 import { DailyChallengeIntro } from "@/components/daily-challenge/intro";
 import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
-import { View, Text } from "@/components/ui";
+import { View } from "@/components/ui";
 
 export default function DailyChallengeIntroScreen() {
   const { 
@@ -10,8 +10,6 @@ export default function DailyChallengeIntroScreen() {
     timeLeftInDay, 
     startChallenge,
     canStartChallenge,
-    // @ts-ignore - Dev mode function might not exist in production
-    resetDailyChallengeForDev
   } = useDailyChallengeContext();
 
   const handleGetStarted = () => {
@@ -33,23 +31,6 @@ export default function DailyChallengeIntroScreen() {
 
   return (
     <View className="flex-1">
-      {/* DEV MODE: Show reset button if available */}
-      {isDev && resetDailyChallengeForDev && (
-        <View className="mx-4 mb-4">
-          <Text 
-            className="text-xs text-gray-400 text-center mb-2"
-          >
-            DEV MODE - Current state: {dailyChallenge.currentDayState}
-          </Text>
-          <Text 
-            className="text-xs text-blue-400 text-center underline"
-            onPress={resetDailyChallengeForDev}
-          >
-            Reset to Pending State
-          </Text>
-        </View>
-      )}
-      
       {/* Main Intro Component */}
       <DailyChallengeIntro
         onGetStarted={handleGetStarted}

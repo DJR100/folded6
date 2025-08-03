@@ -103,7 +103,7 @@ export function PhotoCapture({
   const isButtonDisabled = isLoading || isProcessing;
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 bg-background">
       {/* Main Content Card */}
       <View className="flex-1 px-6">
         <View 
