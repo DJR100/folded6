@@ -83,7 +83,7 @@ export default function Index() {
           </View>
 
           <View className="flex flex-col gap-2 items-center">
-            <Text>You've been bet-free for:</Text>
+            <Text>Bet Free:</Text>
             {/* Streak duration */}
             <View className="flex flex-row gap-4 items-baseline">
               {/* Major */}
@@ -102,10 +102,10 @@ export default function Index() {
                 <Text>{streak.minor.units}</Text>
               </View>
             </View>
-            {/* New Money Saved Ticker */}
+            {/* Money Saved Ticker */}
             {usdPerMs && quitTimestampMs && (
               <View className="mt-2 items-center">
-                <Text>Money saved since quitting:</Text>
+                <Text>Money Saved:</Text>
                 <MoneySavedTicker usdPerMs={usdPerMs} quitTimestampMs={quitTimestampMs} />
               </View>
             )}

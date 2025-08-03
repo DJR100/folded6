@@ -22,7 +22,7 @@ export function MoneySavedTicker({
   }, [usdPerMs, quitTimestampMs]);
 
   return (
-    <Text variant="h2" className="text-green-500">
+    <Text variant="h1" className="text-green-500">
       {formatCurrency(saved)}
     </Text>
   );
