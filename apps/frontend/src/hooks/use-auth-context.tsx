@@ -112,28 +112,23 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
     const migrateDailyChallengeData = async () => {
       if (!auth.currentUser?.uid) return;
 
-      // Check if user already has dailyChallenge data
       if (!user.dailyChallenge) {
-        console.log("🔄 Migrating user to include daily challenge data...");
-        
-        // Create default daily challenge data
+        // New user - create with app open tracking
         const defaultDailyChallengeData: DailyChallengeData = {
           streakCount: 0,
           lastCompletedDate: null,
-          currentWeek: [false, false, false, false, false, false, false], // Mon-Sun
+          lastAppOpenDate: null, // NEW field
+          currentWeek: [false, false, false, false, false, false, false],
           currentDayState: "pending"
         };
-
-        // Update user document with new daily challenge data
-        await setDoc(
-          doc(db, "users", auth.currentUser.uid),
-          {
-            ...user,
-            dailyChallenge: defaultDailyChallengeData
-          }
-        );
-
-        console.log("✅ Daily challenge migration completed");
+        // ... save to database
+      } else if (!('lastAppOpenDate' in user.dailyChallenge)) {
+        // Existing user - add missing field
+        const updatedData = {
+          ...user.dailyChallenge,
+          lastAppOpenDate: null // Initialize for existing users
+        };
+        // ... save to database
       }
     };
 

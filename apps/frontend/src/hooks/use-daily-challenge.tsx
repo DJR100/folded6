@@ -27,12 +27,13 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     return () => clearInterval(interval);
   }, []);
 
-  // Get daily challenge data with fallback
-  const dailyChallenge: DailyChallengeData = user?.dailyChallenge ?? {
-    streakCount: 0,
-    lastCompletedDate: null,
-    currentWeek: [false, false, false, false, false, false, false],
-    currentDayState: "pending"
+  // Get daily challenge data with fallback and ensure all fields exist
+  const dailyChallenge: DailyChallengeData = {
+    streakCount: user?.dailyChallenge?.streakCount ?? 0,
+    lastCompletedDate: user?.dailyChallenge?.lastCompletedDate ?? null,
+    lastAppOpenDate: (user?.dailyChallenge as any)?.lastAppOpenDate ?? null, // Handle missing field gracefully
+    currentWeek: user?.dailyChallenge?.currentWeek ?? [false, false, false, false, false, false, false],
+    currentDayState: user?.dailyChallenge?.currentDayState ?? "pending"
   };
 
   // Calculate time left in current day (memoized)
@@ -55,20 +56,33 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     };
   }, [currentTime]);
 
-  // Check if it's a new day since last completion (memoized boolean)
-  const isNewDay = useMemo(() => {
-    if (!dailyChallenge.lastCompletedDate) return true;
+  // Add debugging to isFirstOpenToday
+  const isFirstOpenToday = useMemo(() => {
+    const hasNoLastOpen = !dailyChallenge.lastAppOpenDate;
+    
+    if (hasNoLastOpen) {
+      console.log('✅ isFirstOpenToday: true (no lastAppOpenDate)');
+      return true;
+    }
 
-    const lastCompleted = new Date(dailyChallenge.lastCompletedDate);
+    const lastOpen = new Date(dailyChallenge.lastAppOpenDate!);
     const today = new Date();
     
-    // Check if last completion was on a different calendar day
-    return (
-      lastCompleted.getDate() !== today.getDate() ||
-      lastCompleted.getMonth() !== today.getMonth() ||
-      lastCompleted.getFullYear() !== today.getFullYear()
+    const isDifferentDay = (
+      lastOpen.getDate() !== today.getDate() ||
+      lastOpen.getMonth() !== today.getMonth() ||
+      lastOpen.getFullYear() !== today.getFullYear()
     );
-  }, [dailyChallenge.lastCompletedDate]);
+    
+    console.log('🔍 isFirstOpenToday check:', {
+      lastAppOpenDate: dailyChallenge.lastAppOpenDate,
+      lastOpenFormatted: lastOpen.toLocaleDateString(),
+      todayFormatted: today.toLocaleDateString(),
+      isDifferentDay
+    });
+    
+    return isDifferentDay;
+  }, [dailyChallenge.lastAppOpenDate]);
 
   // Check if streak should be reset (memoized boolean)
   const shouldResetStreak = useMemo(() => {
@@ -103,14 +117,31 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     }));
   }, [dailyChallenge.currentWeek]);
 
-  // Determine if challenge should auto-launch (memoized)
+  // Add comprehensive debugging to the shouldAutoLaunch logic
   const shouldAutoLaunch = useMemo(() => {
-    return (
-      isNewDay &&
+    const conditions = {
+      isFirstOpenToday,
+      isPending: dailyChallenge.currentDayState === "pending",
+      isOnboarded: (user?.tier ?? 0) > 0,
+      lastAppOpenDate: dailyChallenge.lastAppOpenDate,
+      currentDayState: dailyChallenge.currentDayState,
+      userTier: user?.tier,
+      devMode: __DEV__
+    };
+    
+    const result = (
+      isFirstOpenToday &&
       dailyChallenge.currentDayState === "pending" &&
-      (user?.tier ?? 0) > 0 // Only for onboarded users
+      (user?.tier ?? 0) > 0
     );
-  }, [isNewDay, dailyChallenge.currentDayState, user?.tier]);
+    
+    console.log('🔍 shouldAutoLaunch calculation:', {
+      ...conditions,
+      finalResult: result
+    });
+    
+    return result;
+  }, [isFirstOpenToday, dailyChallenge.currentDayState, user?.tier]);
 
   // Check if user can start challenge (memoized) - allow skipped state too
   const canStartChallenge = useMemo(() => {
@@ -130,6 +161,7 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
       const updatedData: DailyChallengeData = {
         streakCount: dailyChallenge.streakCount, // Keep current streak
         lastCompletedDate: dailyChallenge.lastCompletedDate,
+        lastAppOpenDate: dailyChallenge.lastAppOpenDate, // Keep app open tracking
         currentWeek: dailyChallenge.currentWeek, // Keep current week progress
         currentDayState: "pending" // Reset to pending for dev testing
       };
@@ -159,6 +191,7 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
       const updatedData: DailyChallengeData = {
         streakCount: resetStreak ? 0 : dailyChallenge.streakCount,
         lastCompletedDate: dailyChallenge.lastCompletedDate,
+        lastAppOpenDate: dailyChallenge.lastAppOpenDate, // Keep app open tracking
         currentWeek: [false, false, false, false, false, false, false], // Reset week
         currentDayState: "pending"
       };
@@ -204,6 +237,7 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
       const updatedData: DailyChallengeData = {
         streakCount: dailyChallenge.streakCount + 1,
         lastCompletedDate: now.toISOString(),
+        lastAppOpenDate: dailyChallenge.lastAppOpenDate, // Keep app open tracking
         currentWeek: newCurrentWeek,
         currentDayState: "completed"
       };
@@ -252,10 +286,28 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
 
   // Auto-reset for new day when component mounts or day changes
   useEffect(() => {
-    if (isNewDay && dailyChallenge.currentDayState !== "pending") {
+    if (isFirstOpenToday && dailyChallenge.currentDayState !== "pending") {
       resetForNewDay();
     }
-  }, [isNewDay, dailyChallenge.currentDayState, resetForNewDay]);
+  }, [isFirstOpenToday, dailyChallenge.currentDayState, resetForNewDay]);
+
+  // Add function to track app opens
+  const trackAppOpen = useCallback(async () => {
+    if (!user?.uid) return;
+
+    try {
+      const now = new Date();
+      const updatedData: DailyChallengeData = {
+        ...dailyChallenge,
+        lastAppOpenDate: now.toISOString()
+      };
+
+      await updateUser("dailyChallenge", updatedData);
+      console.log("📱 App open tracked");
+    } catch (err) {
+      console.error("Error tracking app open:", err);
+    }
+  }, [user?.uid, dailyChallenge, updateUser]);
 
   return {
     // Data
@@ -274,6 +326,7 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     completeChallenge,
     skipChallenge,
     resetForNewDay,
+    trackAppOpen,
     
     // DEV: Development helpers
     ...(DEV_MODE && { resetDailyChallengeForDev })

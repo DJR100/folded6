@@ -2,6 +2,7 @@
 export interface DailyChallengeData {
   streakCount: number;
   lastCompletedDate: string | null;
+  lastAppOpenDate: string | null; // NEW: Track last app open
   currentWeek: boolean[];
   currentDayState: "pending" | "completed" | "skipped";
 }
@@ -39,6 +40,7 @@ export interface UseDailyChallengeReturn {
   completeChallenge: (photo?: PhotoResult) => Promise<void>;
   skipChallenge: () => Promise<void>;
   resetForNewDay: () => Promise<void>;
+  trackAppOpen: () => Promise<void>;
   
   // DEV: Development helpers (only available in dev mode)
   resetDailyChallengeForDev?: () => Promise<void>;

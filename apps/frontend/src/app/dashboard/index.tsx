@@ -104,7 +104,7 @@ export default function Index() {
             </View>
             {/* New Money Saved Ticker */}
             {usdPerMs && quitTimestampMs && (
-              <View className="mt-2">
+              <View className="mt-2 items-center">
                 <Text>Money saved since quitting:</Text>
                 <MoneySavedTicker usdPerMs={usdPerMs} quitTimestampMs={quitTimestampMs} />
               </View>
