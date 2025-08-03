@@ -1,31 +1,34 @@
 import { Stack } from "expo-router";
 
 import { colors } from "@/constants/colors";
+import { DailyChallengeProvider } from "@/hooks/daily-challenge-context";
 
 export default function DailyChallengeLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: {
-          backgroundColor: colors.background,
-        },
-        presentation: "modal", // This makes it appear as a modal overlay
-        animation: "slide_from_bottom",
-      }}
-    >
-      <Stack.Screen 
-        name="intro" 
-        options={{
-          gestureEnabled: false, // Prevent swipe to dismiss - user must complete or skip
+    <DailyChallengeProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: colors.background,
+          },
+          // Remove modal presentation to keep navigation bar visible
+          animation: "slide_from_bottom",
         }}
-      />
-      <Stack.Screen 
-        name="photo-capture"
-        options={{
-          gestureEnabled: false, // Prevent swipe to dismiss
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen 
+          name="intro" 
+          options={{
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen 
+          name="photo-capture"
+          options={{
+            gestureEnabled: false,
+          }}
+        />
+      </Stack>
+    </DailyChallengeProvider>
   );
 } 

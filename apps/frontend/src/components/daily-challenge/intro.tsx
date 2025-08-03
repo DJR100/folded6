@@ -11,96 +11,74 @@ export function DailyChallengeIntro({
 }: DailyChallengeIntroProps) {
   return (
     <View className="flex-1 bg-black">
-      {/* Top Header with Logo */}
-      <View className="flex-row items-center justify-between px-4 pt-12 pb-4">
-        <Text className="text-lg font-medium text-white">candle.</Text>
-        <View className="flex-1" />
-        {/* Flame icon - could be replaced with actual flame icon */}
-        <Text className="text-2xl">🔥</Text>
-      </View>
-
-      {/* Progress Bar Placeholder */}
-      <View className="mx-4 mb-8">
+      {/* Main Content Card - Much larger and with folded green background */}
+      <View className="flex-1 px-4">
         <View 
-          className="h-1 rounded-full"
-          style={{ backgroundColor: '#4C4C4C' }}
-        >
-          {/* Progress fill - will be animated later */}
-          <View 
-            className="h-full rounded-full"
-            style={{ 
-              backgroundColor: '#00C399',
-              width: '0%' // Will be dynamic based on completion
-            }}
-          />
-        </View>
-      </View>
-
-      {/* Main Content Card */}
-      <View className="flex-1 px-6">
-        <View 
-          className="rounded-3xl p-8 items-center justify-center"
+          className="rounded-3xl p-8 justify-center"
           style={{
-            backgroundColor: '#1a1a1a',
-            // Subtle gradient effect using shadow/elevation
-            shadowColor: '#00C399',
+            backgroundColor: '#3DF08B', // Folded green color
+            shadowColor: '#3DF08B',
             shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.1,
+            shadowOpacity: 0.3,
             shadowRadius: 20,
             elevation: 10,
-            minHeight: 400,
+            minHeight: 500, // Much larger
+            flex: 1, // Take up more space
           }}
         >
-          {/* Daily Challenge Title */}
-          <Text className="text-white text-lg font-medium mb-6">
-            Daily Challenge
-          </Text>
-
-          {/* Main Challenge Text */}
-          <Text 
-            className="text-white text-2xl font-bold text-center mb-8 leading-tight"
-            style={{ lineHeight: 32 }}
-          >
-            Answer the{'\n'}following question{'\n'}today.
-          </Text>
-
-          {/* Countdown Timer */}
-          <Text 
-            className="text-white text-4xl font-bold mb-2"
-            style={{ fontFamily: 'monospace' }}
-          >
-            {timeLeft}
-          </Text>
-          
-          <Text 
-            className="text-white text-sm mb-12 opacity-60"
-          >
-            left to extend your {streakCount}-day streak!
-          </Text>
-
-          {/* Get Started Button */}
-          <TouchableOpacity
-            onPress={onGetStarted}
-            className="w-full rounded-2xl py-4 px-8"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderWidth: 2,
-              borderColor: 'transparent',
-            }}
-            // Add press state styling
-            activeOpacity={0.8}
-          >
-            <Text 
-              className="text-center font-semibold text-lg"
-              style={{ color: '#000000' }}
-            >
-              Get Started
+          {/* Left-aligned challenge texts */}
+          <View className="mb-12">
+            <Text className="text-black text-lg font-medium mb-4 text-left">
+              Daily Challenge
             </Text>
-          </TouchableOpacity>
+
+            <Text 
+              className="text-black text-2xl font-bold text-left mb-8 leading-tight"
+              style={{ lineHeight: 32 }}
+            >
+              Answer the{'\n'}following question{'\n'}today.
+            </Text>
+          </View>
+
+          {/* Centrally aligned timer and button section */}
+          <View className="items-center">
+            {/* Countdown Timer */}
+            <Text 
+              className="text-black text-4xl font-bold mb-2"
+              style={{ fontFamily: 'monospace' }}
+            >
+              {timeLeft}
+            </Text>
+            
+            <Text 
+              className="text-black text-sm mb-12 opacity-70"
+            >
+              left to extend your {streakCount}-day streak!
+            </Text>
+
+            {/* Get Started Button */}
+            <TouchableOpacity
+              onPress={onGetStarted}
+              className="w-full rounded-2xl py-4 px-8"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderWidth: 2,
+                borderColor: 'transparent',
+              }}
+              activeOpacity={0.8}
+            >
+              <Text 
+                className="text-center font-semibold text-lg"
+                style={{ color: '#000000' }}
+              >
+                Get Started
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
-      {/* Bottom spacing */}
+      {/* Bottom spacing for navigation bar */}
       <View className="h-20" />
     </View>
   );

@@ -9,6 +9,9 @@ import {
 import { db } from "@/lib/firebase";
 import { useAuthContext } from "./use-auth-context";
 
+// DEV MODE FLAG - Set to true during development to bypass completed state checks
+const DEV_MODE = __DEV__ && true; // Change to false when you want normal behavior
+
 export function useDailyChallenge(): UseDailyChallengeReturn {
   const { user, updateUser } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -109,10 +112,36 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     );
   }, [isNewDay, dailyChallenge.currentDayState, user?.tier]);
 
-  // Check if user can start challenge (memoized)
+  // Check if user can start challenge (memoized) - dev mode bypasses completion check
   const canStartChallenge = useMemo(() => {
-    return dailyChallenge.currentDayState === "pending";
+    return DEV_MODE || dailyChallenge.currentDayState === "pending";
   }, [dailyChallenge.currentDayState]);
+
+  // DEV: Reset daily challenge state for development
+  const resetDailyChallengeForDev = useCallback(async () => {
+    if (!user?.uid || !DEV_MODE) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const updatedData: DailyChallengeData = {
+        streakCount: dailyChallenge.streakCount, // Keep current streak
+        lastCompletedDate: dailyChallenge.lastCompletedDate,
+        currentWeek: dailyChallenge.currentWeek, // Keep current week progress
+        currentDayState: "pending" // Reset to pending for dev testing
+      };
+
+      await updateUser("dailyChallenge", updatedData);
+      console.log("🔧 DEV: Daily challenge reset to pending state");
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to reset daily challenge");
+      console.error("Error resetting daily challenge for dev:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.uid, dailyChallenge, updateUser]);
 
   // Reset for new day (callback function)
   const resetForNewDay = useCallback(async () => {
@@ -242,6 +271,9 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     startChallenge,
     completeChallenge,
     skipChallenge,
-    resetForNewDay
+    resetForNewDay,
+    
+    // DEV: Development helpers
+    ...(DEV_MODE && { resetDailyChallengeForDev })
   };
 } 

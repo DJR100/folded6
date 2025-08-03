@@ -1,16 +1,27 @@
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { router } from "expo-router";
 
 import { DashboardLayout } from "@/components/layouts/dashboard";
 import { ProfileEditModal } from "@/components/profile-edit-modal";
 import { Text, View, Button } from "@/components/ui";
 import { StreakTracker } from "@/components/daily-challenge/streak-tracker";
-import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
+// REMOVE this line temporarily: import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 
 export default function Index() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { dailyChallenge, weekProgress } = useDailyChallengeContext();
+  
+  // For development - use mock data or bypass context entirely
+  const mockWeekProgress = [
+    { day: "M" as const, completed: true, isToday: false },
+    { day: "TU" as const, completed: true, isToday: false },
+    { day: "W" as const, completed: true, isToday: false },
+    { day: "TH" as const, completed: true, isToday: false },
+    { day: "F" as const, completed: true, isToday: true },
+    { day: "SA" as const, completed: false, isToday: false },
+    { day: "SU" as const, completed: false, isToday: false },
+  ];
 
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
@@ -62,35 +73,34 @@ export default function Index() {
           </View>
         </View>
 
-        {/* Primary Action Button */}
+        {/* Primary Action Button - ALWAYS ENABLED for development */}
         <View className="mt-6 px-4">
-          <View 
+          <TouchableOpacity
+            onPress={() => {
+              console.log("🔥 Starting daily challenge flow");
+              router.push("/(daily-challenge)/intro");
+            }}
             className="w-full rounded-lg flex-row items-center justify-center"
             style={{ 
-              height: 48, // 48px on phones, could be responsive
-              backgroundColor: '#3DF08B', // Folded's signature green
+              height: 48,
+              backgroundColor: '#3DF08B',
               opacity: 0.8,
-              pointerEvents: 'none'
             }}
           >
-            <Text 
-              className="font-medium" 
-              style={{ color: 'white' }}
-            >
-              Start Daily Challenge
+            <Text className="font-medium" style={{ color: 'white' }}>
+              Start Daily Challenge (Dev)
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
-        {/* Daily Streak Widget - REPLACED with modular component */}
+        {/* Streak Tracker with mock data */}
         <StreakTracker
-          streakCount={dailyChallenge.streakCount}
-          weekProgress={weekProgress}
+          streakCount={5}
+          weekProgress={mockWeekProgress}
           className="mt-6 px-4"
         />
       </View>
 
-      {/* Use the existing ProfileEditModal component */}
       <ProfileEditModal
         visible={isModalVisible}
         onClose={closeModal}

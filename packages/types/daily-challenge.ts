@@ -39,6 +39,9 @@ export interface UseDailyChallengeReturn {
   completeChallenge: (photo?: PhotoResult) => Promise<void>;
   skipChallenge: () => Promise<void>;
   resetForNewDay: () => Promise<void>;
+  
+  // DEV: Development helpers (only available in dev mode)
+  resetDailyChallengeForDev?: () => Promise<void>;
 }
 
 // Component prop types

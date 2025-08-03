@@ -8,7 +8,7 @@ const DailyChallengeContext = createContext<DailyChallengeContextValue | null>(n
 
 // Provider component
 export function DailyChallengeProvider({ children }: PropsWithChildren) {
-  const dailyChallengeValue = useDailyChallenge();
+  const dailyChallengeValue = useDailyChallenge(); // This is correct - use the hook
 
   return (
     <DailyChallengeContext.Provider value={dailyChallengeValue}>
