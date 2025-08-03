@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 import { DashboardLayout } from "@/components/layouts/dashboard";
 import { PanicButton } from "@/components/panic-button";
 import { Text, View } from "@/components/ui";
+import { StreakTracker } from "@/components/daily-challenge/streak-tracker";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 import { cn } from "@/lib/cn";
 import { MoneySavedTicker } from "@/components/money-saved-ticker";
 
 export default function Index() {
   const { user } = useAuthContext();
+
+  // Connect to daily challenge system
+  const { 
+    dailyChallenge, 
+    weekProgress, 
+    canStartChallenge,
+    timeLeftInDay,
+    isLoading
+  } = useDailyChallengeContext();
 
   const [streak, setStreak] = useState<{
     major: {
@@ -70,6 +83,44 @@ export default function Index() {
     if (!user) return;
   }, [!!user]);
 
+  // Daily challenge button configuration
+  const getButtonConfig = () => {
+    if (dailyChallenge.currentDayState === "completed") {
+      return {
+        text: `${timeLeftInDay.formatted} until next challenge`,
+        disabled: true,
+        opacity: 0.5,
+        textColor: 'white',
+        textOpacity: 1.0
+      };
+    } else if (dailyChallenge.currentDayState === "skipped") {
+      return {
+        text: "Try Daily Challenge Again",
+        disabled: false,
+        opacity: 0.8,
+        textColor: 'white',
+        textOpacity: 1.0
+      };
+    } else if (canStartChallenge) {
+      return {
+        text: "Start Daily Challenge",
+        disabled: false,
+        opacity: 0.8,
+        textColor: 'white',
+        textOpacity: 1.0
+      };
+    } else {
+      return {
+        text: "Challenge Not Available",
+        disabled: true,
+        opacity: 0.5,
+        textColor: 'white',
+        textOpacity: 1.0
+      };
+    }
+  };
+
+  const buttonConfig = getButtonConfig();
   const usdPerMs = user?.spendMeta?.usdPerMs;
   const quitTimestampMs = user?.streak?.start;
 
@@ -110,6 +161,42 @@ export default function Index() {
               </View>
             )}
           </View>
+
+          {/* Daily Challenge Button - Move outside nested content, give it proper space */}
+          <View className="w-full px-4 mt-6">
+            <TouchableOpacity
+              onPress={() => {
+                if (!buttonConfig.disabled) {
+                  console.log("🔥 Starting daily challenge flow");
+                  router.push("/(daily-challenge)/intro");
+                }
+              }}
+              disabled={buttonConfig.disabled || isLoading}
+              className="w-full rounded-lg flex-row items-center justify-center"
+              style={{ 
+                height: 48,
+                backgroundColor: dailyChallenge.currentDayState === "skipped" ? '#F59E0B' : '#3DF08B',
+                opacity: (buttonConfig.disabled || isLoading) ? buttonConfig.opacity : buttonConfig.opacity,
+              }}
+            >
+              <Text 
+                className="font-medium" 
+                style={{ 
+                  color: buttonConfig.textColor,
+                  opacity: buttonConfig.textOpacity
+                }}
+              >
+                {isLoading ? 'Loading...' : buttonConfig.text}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Daily Challenge Streak Tracker - Give it proper space */}
+          <StreakTracker
+            streakCount={dailyChallenge.streakCount}
+            weekProgress={weekProgress}
+            className="w-full px-4"
+          />
         </View>
         <PanicButton />
       </View>
