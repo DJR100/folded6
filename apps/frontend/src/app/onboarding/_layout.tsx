@@ -21,6 +21,7 @@ export default function OnboardingLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="1" />
       <Stack.Screen name="2" />
+      <Stack.Screen name="recovery-progress" />
       <Stack.Screen name="3" />
       <Stack.Screen name="4" />
       <Stack.Screen name="5" />

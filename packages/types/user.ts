@@ -24,6 +24,7 @@ export interface User {
       monthlySpend: Range | null;
       estimatedLifetimeLoss: number | null;
     };
+    existingRecoveryDays?: number; // Days of recovery they had before joining
   };
   streak: {
     start: number; // Timestamp

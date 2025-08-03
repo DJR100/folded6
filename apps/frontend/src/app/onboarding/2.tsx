@@ -18,7 +18,7 @@ export default function Onboarding() {
         text: "Start recovery",
         onPress: () => {
           setOnboarding(3);
-          router.push("/onboarding/3");
+          router.push("/onboarding/recovery-progress");
         },
       }}
       className="gap-0"
