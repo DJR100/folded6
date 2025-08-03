@@ -104,30 +104,6 @@ export function PhotoCapture({
 
   return (
     <View className="flex-1 bg-black">
-      {/* Top Header with Logo and Share Icon */}
-      <View className="flex-row items-center justify-between px-4 pt-12 pb-4">
-        <Text className="text-lg font-medium text-white">candle.</Text>
-        <TouchableOpacity>
-          <MaterialIcons name="share" size={24} color="white" style={{ opacity: 0.6 }} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Progress Bar - could show partial progress */}
-      <View className="mx-4 mb-8">
-        <View 
-          className="h-1 rounded-full"
-          style={{ backgroundColor: '#4C4C4C' }}
-        >
-          <View 
-            className="h-full rounded-full"
-            style={{ 
-              backgroundColor: '#00C399',
-              width: '50%' // 50% since we're halfway through
-            }}
-          />
-        </View>
-      </View>
-
       {/* Main Content Card */}
       <View className="flex-1 px-6">
         <View 
@@ -181,34 +157,32 @@ export function PhotoCapture({
               </Text>
             </TouchableOpacity>
 
-            {/* Photo Action Buttons */}
-            <View className="flex-row items-center justify-center space-x-16">
-              {/* Gallery Button */}
+            {/* Photo Action Buttons - aligned to edges */}
+            <View className="flex-row justify-between w-full px-0">
+              {/* Gallery Button - aligned to left edge */}
               <TouchableOpacity
                 onPress={handleGalleryPress}
                 disabled={isButtonDisabled}
-                className="w-18 h-18 rounded-full items-center justify-center border-2"
+                className="w-18 h-18 rounded-full items-center justify-center"
                 style={{
-                  borderColor: '#00C399',
                   backgroundColor: 'transparent',
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
-                <MaterialIcons name="photo-library" size={32} color="#00C399" />
+                <MaterialIcons name="photo-library" size={32} color="black" />
               </TouchableOpacity>
 
-              {/* Camera Button */}
+              {/* Camera Button - aligned to right edge */}
               <TouchableOpacity
                 onPress={handleCameraPress}
                 disabled={isButtonDisabled}
-                className="w-18 h-18 rounded-full items-center justify-center border-2"
+                className="w-18 h-18 rounded-full items-center justify-center"
                 style={{
-                  borderColor: '#00C399',
                   backgroundColor: 'transparent',
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
-                <MaterialIcons name="camera-alt" size={32} color="#00C399" />
+                <MaterialIcons name="camera-alt" size={32} color="black" />
               </TouchableOpacity>
             </View>
           </View>

@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 
 import { DailyChallengeIntro } from "@/components/daily-challenge/intro";
-import { ProgressBar } from "@/components/daily-challenge/progress-bar";
 import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 import { View, Text } from "@/components/ui";
 
@@ -34,15 +33,6 @@ export default function DailyChallengeIntroScreen() {
 
   return (
     <View className="flex-1">
-      {/* Header with Folded text and fire emoji - no padding */}
-      <View className="flex-row items-center justify-between px-4">
-        <Text className="text-lg font-medium text-white ml-3">Folded</Text>
-        <Text className="text-2xl mr-3">🔥</Text>
-      </View>
-
-      {/* Progress Bar - positioned immediately below header */}
-      <ProgressBar progress={0} className="mx-4 mb-8" />
-
       {/* DEV MODE: Show reset button if available */}
       {isDev && resetDailyChallengeForDev && (
         <View className="mx-4 mb-4">
