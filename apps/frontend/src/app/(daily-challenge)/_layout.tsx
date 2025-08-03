@@ -12,20 +12,19 @@ export default function DailyChallengeLayout() {
           contentStyle: {
             backgroundColor: colors.background,
           },
-          // Remove modal presentation to keep navigation bar visible
-          animation: "slide_from_bottom",
+          // No presentation property = use regular stack navigation
         }}
       >
         <Stack.Screen 
           name="intro" 
           options={{
-            gestureEnabled: false,
+            gestureEnabled: true,
           }}
         />
         <Stack.Screen 
           name="photo-capture"
           options={{
-            gestureEnabled: false,
+            gestureEnabled: true,
           }}
         />
       </Stack>

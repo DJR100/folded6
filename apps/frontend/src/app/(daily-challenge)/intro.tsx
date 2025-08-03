@@ -34,14 +34,13 @@ export default function DailyChallengeIntroScreen() {
 
   return (
     <View className="flex-1">
-      {/* Top Header with Logo positioned above progress bar */}
-      <View className="flex-row items-center justify-between px-4 pt-12 pb-4">
-        <Text className="text-lg font-medium text-white">candle.</Text>
-        <View className="flex-1" />
-        <Text className="text-2xl">🔥</Text>
+      {/* Header with Folded text and fire emoji - no padding */}
+      <View className="flex-row items-center justify-between px-4">
+        <Text className="text-lg font-medium text-white ml-3">Folded</Text>
+        <Text className="text-2xl mr-3">🔥</Text>
       </View>
-      
-      {/* Single Progress Bar */}
+
+      {/* Progress Bar - positioned immediately below header */}
       <ProgressBar progress={0} className="mx-4 mb-8" />
 
       {/* DEV MODE: Show reset button if available */}
