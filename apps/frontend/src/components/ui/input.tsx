@@ -12,6 +12,9 @@ interface InputProps {
   secureTextEntry?: boolean;
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
   onBlur?: (value: string | undefined) => void;
+  onSubmitEditing?: () => void;
+  returnKeyType?: "done" | "go" | "next" | "search" | "send";
+  blurOnSubmit?: boolean;
   multiline?: boolean;
   maxLength?: number;
 }
@@ -23,6 +26,9 @@ export const Input = ({
   secureTextEntry,
   keyboardType = "default",
   onBlur,
+  onSubmitEditing,
+  returnKeyType = "done",
+  blurOnSubmit = true,
   multiline = false,
   maxLength,
 }: InputProps) => {
@@ -54,6 +60,9 @@ export const Input = ({
       secureTextEntry={secureTextEntry}
       keyboardType={keyboardType}
       onBlur={() => onBlur?.(val)}
+      onSubmitEditing={onSubmitEditing}
+      returnKeyType={returnKeyType}
+      blurOnSubmit={blurOnSubmit}
       multiline={multiline}
       maxLength={maxLength}
       textAlignVertical={multiline ? "top" : "center"}
