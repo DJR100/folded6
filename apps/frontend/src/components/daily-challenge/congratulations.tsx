@@ -10,63 +10,60 @@ interface CongratulationsProps {
 export function Congratulations({ onClose }: CongratulationsProps) {
   return (
     <View className="flex-1 bg-background">
-      {/* Main Content Card with Purple Background */}
+      {/* Main Content Card - Consistent with intro/photo capture */}
       <View className="flex-1 px-4">
         <View 
-          className="rounded-3xl p-8 justify-center items-center"
+          className="rounded-3xl p-8 justify-center"
           style={{
             backgroundColor: '#8B5CF6', // Purple color
-            shadowColor: '#8B5CF6',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.3,
-            shadowRadius: 20,
-            elevation: 10,
             minHeight: 500,
-            flex: 1,
+            flex: 1, // Match other pages
           }}
         >
-          {/* Congratulations Text */}
-          <View className="items-center mb-12">
+          {/* Congratulations Text - All centered */}
+          <View className="mb-12 items-center">
             <Text 
-              className="text-white text-3xl font-bold text-center mb-8 leading-tight"
-              style={{ lineHeight: 40 }}
+              className="text-white text-2xl font-bold text-center leading-tight"
+              style={{ lineHeight: 32 }}
             >
               Congratulations on{'\n'}completing today's{'\n'}recovery challenge!
             </Text>
 
             <Text 
-              className="text-white text-xl font-medium text-center mb-6"
+              className="text-white text-lg font-medium text-center mt-6"
               style={{ opacity: 0.9 }}
             >
               Your streak has been updated.
             </Text>
 
             <Text 
-              className="text-white text-xl font-medium text-center"
+              className="text-white text-lg font-medium text-center mt-2"
               style={{ opacity: 0.9 }}
             >
               See you tomorrow!
             </Text>
           </View>
 
-          {/* Close Button - Same style as Get Started button */}
-          <TouchableOpacity
-            onPress={onClose}
-            className="w-full rounded-2xl py-4 px-8"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderWidth: 2,
-              borderColor: 'transparent',
-            }}
-            activeOpacity={0.8}
-          >
-            <Text 
-              className="text-center font-semibold text-lg"
-              style={{ color: '#000000' }}
+          {/* Close Button - Centered like intro button */}
+          <View className="items-center">
+            <TouchableOpacity
+              onPress={onClose}
+              className="w-full rounded-2xl py-4 px-8"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderWidth: 2,
+                borderColor: 'transparent',
+              }}
+              activeOpacity={0.8}
             >
-              Close
-            </Text>
-          </TouchableOpacity>
+              <Text 
+                className="text-center font-semibold text-lg"
+                style={{ color: '#000000' }}
+              >
+                Close
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 

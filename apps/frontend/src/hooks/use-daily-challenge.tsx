@@ -112,9 +112,11 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     );
   }, [isNewDay, dailyChallenge.currentDayState, user?.tier]);
 
-  // Check if user can start challenge (memoized) - dev mode bypasses completion check
+  // Check if user can start challenge (memoized) - allow skipped state too
   const canStartChallenge = useMemo(() => {
-    return DEV_MODE || dailyChallenge.currentDayState === "pending";
+    return DEV_MODE || 
+           dailyChallenge.currentDayState === "pending" ||
+           dailyChallenge.currentDayState === "skipped";
   }, [dailyChallenge.currentDayState]);
 
   // DEV: Reset daily challenge state for development

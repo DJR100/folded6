@@ -104,44 +104,31 @@ export function PhotoCapture({
 
   return (
     <View className="flex-1 bg-background">
-      {/* Main Content Card */}
-      <View className="flex-1 px-6">
+      {/* Main Content Card - Exact same structure as intro */}
+      <View className="flex-1 px-4">
         <View 
-          className="rounded-3xl p-8 items-center justify-center relative"
+          className="rounded-3xl p-8 justify-center"
           style={{
-            backgroundColor: '#2DD4BF', // Teal color from your screenshot
+            backgroundColor: '#2DD4BF', // Teal color
             minHeight: 500,
+            flex: 1,
           }}
         >
-          {/* Tier Header */}
-          <View 
-            className="absolute top-6 left-6 px-4 py-2 rounded-full"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
-          >
-            <Text className="text-white text-sm font-medium">
-              Tier 1: Daily Reflection
+          {/* Header section - Moved up by height of words */}
+          <View className="mb-12" style={{ marginTop: -40 }}>
+            <Text className="text-white text-lg font-medium mb-4 text-left">
+              Daily Challenge
             </Text>
-          </View>
 
-          {/* Share Icon - Top Right */}
-          <TouchableOpacity 
-            className="absolute top-6 right-6"
-            disabled={isButtonDisabled}
-          >
-            <MaterialIcons name="share" size={24} color="white" style={{ opacity: 0.8 }} />
-          </TouchableOpacity>
-
-          {/* Main Prompt Text */}
-          <View className="flex-1 justify-center items-center px-8">
             <Text 
-              className="text-white text-3xl font-bold text-center leading-tight"
-              style={{ lineHeight: 40 }}
+              className="text-white text-2xl font-bold text-center leading-tight mb-8"
+              style={{ lineHeight: 32 }}
             >
               Snap a photo of what{'\n'}you're doing right{'\n'}now.
             </Text>
           </View>
 
-          {/* Bottom Action Area */}
+          {/* Centrally aligned action section - EXACT same structure as intro */}
           <View className="items-center">
             {/* Skip Option */}
             <TouchableOpacity 
@@ -157,32 +144,32 @@ export function PhotoCapture({
               </Text>
             </TouchableOpacity>
 
-            {/* Photo Action Buttons - aligned to edges */}
-            <View className="flex-row justify-between w-full px-0">
-              {/* Gallery Button - aligned to left edge */}
+            {/* Photo Action Buttons - Black icons with white backgrounds */}
+            <View className="flex-row justify-center items-center" style={{ gap: 40 }}>
+              {/* Gallery Button */}
               <TouchableOpacity
                 onPress={handleGalleryPress}
                 disabled={isButtonDisabled}
-                className="w-18 h-18 rounded-full items-center justify-center"
+                className="w-20 h-20 rounded-full items-center justify-center"
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#FFFFFF', // White background
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
-                <MaterialIcons name="photo-library" size={32} color="black" />
+                <MaterialIcons name="photo-library" size={40} color="black" />
               </TouchableOpacity>
 
-              {/* Camera Button - aligned to right edge */}
+              {/* Camera Button */}
               <TouchableOpacity
                 onPress={handleCameraPress}
                 disabled={isButtonDisabled}
-                className="w-18 h-18 rounded-full items-center justify-center"
+                className="w-20 h-20 rounded-full items-center justify-center"
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#FFFFFF', // White background
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
-                <MaterialIcons name="camera-alt" size={32} color="black" />
+                <MaterialIcons name="camera-alt" size={40} color="black" />
               </TouchableOpacity>
             </View>
           </View>

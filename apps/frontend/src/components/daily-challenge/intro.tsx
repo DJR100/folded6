@@ -11,17 +11,12 @@ export function DailyChallengeIntro({
 }: DailyChallengeIntroProps) {
   return (
     <View className="flex-1 bg-background">
-      {/* Main Content Card - Much larger and with folded green background */}
+      {/* Main Content Card - Removed shadow/shine effects */}
       <View className="flex-1 px-4">
         <View 
           className="rounded-3xl p-8 justify-center"
           style={{
             backgroundColor: '#3DF08B', // Folded green color
-            shadowColor: '#3DF08B',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.3,
-            shadowRadius: 20,
-            elevation: 10,
             minHeight: 500, // Much larger
             flex: 1, // Take up more space
           }}
