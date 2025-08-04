@@ -7,13 +7,14 @@ import { PanicButton } from "@/components/panic-button";
 import { Text, View } from "@/components/ui";
 import { StreakTracker } from "@/components/daily-challenge/streak-tracker";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
+import { DailyChallengeProvider, useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 import { cn } from "@/lib/cn";
 import { MoneySavedTicker } from "@/components/money-saved-ticker";
 
-export default function Index() {
+// Internal component that uses the daily challenge context
+function DashboardContent() {
   const { user } = useAuthContext();
-
+  
   // Connect to daily challenge system
   const { 
     dailyChallenge, 
@@ -24,25 +25,19 @@ export default function Index() {
   } = useDailyChallengeContext();
 
   const [streak, setStreak] = useState<{
-    major: {
-      value: number;
-      units: string;
-    };
-    minor: {
-      value: number;
-      units: string;
-    };
+    major: { value: number; units: string; };
+    minor: { value: number; units: string; };
   }>({ major: { value: 0, units: "s" }, minor: { value: 0, units: "ms" } });
 
+  // Your existing streak calculation logic
   useEffect(() => {
-    const streak = user?.streak.start ? Date.now() - user.streak.start : 0;
-    const update = () => {
-      const streak = user?.streak.start ? Date.now() - user.streak.start : 0;
-      const milliseconds = Math.floor(Math.floor(streak % 1000) / 10);
-      const seconds = Math.floor((streak / 1000) % 60);
-      const minutes = Math.floor((streak / (1000 * 60)) % 60);
-      const hours = Math.floor((streak / (1000 * 60 * 60)) % 24);
-      const days = Math.floor(streak / (1000 * 60 * 60 * 24));
+    const calculateStreak = () => {
+      const streakMs = user?.streak.start ? Date.now() - user.streak.start : 0;
+      const milliseconds = Math.floor(Math.floor(streakMs % 1000) / 10);
+      const seconds = Math.floor((streakMs / 1000) % 60);
+      const minutes = Math.floor((streakMs / (1000 * 60)) % 60);
+      const hours = Math.floor((streakMs / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(streakMs / (1000 * 60 * 60 * 24));
 
       if (days > 0) {
         setStreak({
@@ -72,16 +67,12 @@ export default function Index() {
       }
     };
 
-    update();
-
-    const timeout = streak > 60 * 1000 ? 1000 : 33;
-    const interval = setInterval(update, timeout);
+    calculateStreak();
+    const streakMs = user?.streak.start ? Date.now() - user.streak.start : 0;
+    const timeout = streakMs > 60 * 1000 ? 1000 : 33;
+    const interval = setInterval(calculateStreak, timeout);
     return () => clearInterval(interval);
   }, [user?.streak.start]);
-
-  useEffect(() => {
-    if (!user) return;
-  }, [!!user]);
 
   // Daily challenge button configuration
   const getButtonConfig = () => {
@@ -89,33 +80,40 @@ export default function Index() {
       return {
         text: `${timeLeftInDay.formatted} until next challenge`,
         disabled: true,
-        opacity: 0.5,
-        textColor: 'white',
-        textOpacity: 1.0
+        backgroundColor: 'rgba(255, 255, 255, 0.15)', // Glass-like transparency
+        backdropFilter: 'blur(10px)', // Blur effect (if supported)
+        borderColor: 'rgba(255, 255, 255, 0.4)', // Bright border
+        borderWidth: 1,
+        textColor: '#FFFFFF',
+        textOpacity: 1.0,
+        buttonOpacity: 1.0
       };
     } else if (dailyChallenge.currentDayState === "skipped") {
       return {
         text: "Try Daily Challenge Again",
         disabled: false,
-        opacity: 0.8,
+        backgroundColor: '#F59E0B',
         textColor: 'white',
-        textOpacity: 1.0
+        textOpacity: 1.0,
+        buttonOpacity: 0.8
       };
     } else if (canStartChallenge) {
       return {
         text: "Start Daily Challenge",
         disabled: false,
-        opacity: 0.8,
+        backgroundColor: '#3DF08B',
         textColor: 'white',
-        textOpacity: 1.0
+        textOpacity: 1.0,
+        buttonOpacity: 0.8
       };
     } else {
       return {
         text: "Challenge Not Available",
         disabled: true,
-        opacity: 0.5,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         textColor: 'white',
-        textOpacity: 1.0
+        textOpacity: 0.5,
+        buttonOpacity: 1.0
       };
     }
   };
@@ -128,7 +126,7 @@ export default function Index() {
     <DashboardLayout>
       <View className="flex justify-between flex-1">
         <View className="flex flex-col gap-8 items-center py-8">
-          {/* TODO: replace with animated blob, or picture of face or something more interesting */}
+          {/* Avatar */}
           <View className="w-1/2 aspect-square bg-accent rounded-full items-center ">
             <Text className="text-4xl mt-[40px]">👀</Text>
           </View>
@@ -137,12 +135,10 @@ export default function Index() {
             <Text>Bet Free:</Text>
             {/* Streak duration */}
             <View className="flex flex-row gap-4 items-baseline">
-              {/* Major */}
               <View className="flex flex-row gap-1 items-baseline">
                 <Text variant="h1">{streak.major.value}</Text>
                 <Text>{streak.major.units}</Text>
               </View>
-              {/* Minor */}
               <View className="flex flex-row gap-1 items-baseline">
                 <Text
                   variant="h1"
@@ -162,7 +158,7 @@ export default function Index() {
             )}
           </View>
 
-          {/* Daily Challenge Button - Move outside nested content, give it proper space */}
+          {/* Daily Challenge Button with updated styling */}
           <View className="w-full px-4 mt-6">
             <TouchableOpacity
               onPress={() => {
@@ -175,15 +171,27 @@ export default function Index() {
               className="w-full rounded-lg flex-row items-center justify-center"
               style={{ 
                 height: 48,
-                backgroundColor: dailyChallenge.currentDayState === "skipped" ? '#F59E0B' : '#3DF08B',
-                opacity: (buttonConfig.disabled || isLoading) ? buttonConfig.opacity : buttonConfig.opacity,
+                backgroundColor: buttonConfig.backgroundColor || (dailyChallenge.currentDayState === "skipped" ? '#F59E0B' : '#3DF08B'),
+                opacity: buttonConfig.buttonOpacity || buttonConfig.opacity,
+                borderColor: buttonConfig.borderColor,
+                borderWidth: buttonConfig.borderWidth || 0,
+                // Add a subtle shadow for depth
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2, // For Android
               }}
             >
               <Text 
-                className="font-medium" 
+                className="font-medium text-center" 
                 style={{ 
                   color: buttonConfig.textColor,
-                  opacity: buttonConfig.textOpacity
+                  opacity: buttonConfig.textOpacity,
+                  // Add text shadow for the "shine through" effect
+                  textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 2,
                 }}
               >
                 {isLoading ? 'Loading...' : buttonConfig.text}
@@ -191,7 +199,7 @@ export default function Index() {
             </TouchableOpacity>
           </View>
 
-          {/* Daily Challenge Streak Tracker - Give it proper space */}
+          {/* Daily Challenge Streak Tracker */}
           <StreakTracker
             streakCount={dailyChallenge.streakCount}
             weekProgress={weekProgress}
@@ -201,5 +209,14 @@ export default function Index() {
         <PanicButton />
       </View>
     </DashboardLayout>
+  );
+}
+
+// Main export component with scoped provider
+export default function Index() {
+  return (
+    <DailyChallengeProvider>
+      <DashboardContent />
+    </DailyChallengeProvider>
   );
 }

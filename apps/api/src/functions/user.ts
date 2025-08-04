@@ -32,6 +32,12 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
     streak: {
       start: Date.now(),
     },
+    dailyChallenge: {
+      streakCount: 0,
+      lastCompletedDate: null,
+      currentWeek: [false, false, false, false, false, false, false],
+      currentDayState: "pending",
+    },
     message: null,
     guardian: {
       guardianId: null,

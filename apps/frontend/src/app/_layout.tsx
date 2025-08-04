@@ -14,7 +14,6 @@ export default function Root() {
   const fontsLoaded = useFontLoad();
   if (!fontsLoaded) return null;
 
-  // Set up the auth context and render our layout inside of it.
   return (
     <GestureHandlerRootView>
       <PortalProvider>

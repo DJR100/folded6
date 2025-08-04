@@ -256,7 +256,7 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid, dailyChallenge, updateUser]);
+  }, [user?.uid, dailyChallenge, updateUser, isFirstOpenToday]);
 
   // Skip challenge
   const skipChallenge = useCallback(async () => {
@@ -284,12 +284,20 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
     }
   }, [user?.uid, dailyChallenge, updateUser]);
 
-  // Auto-reset for new day when component mounts or day changes
+  // Replace the auto-reset effect with this optimized version:
   useEffect(() => {
+    // Only run the check if we're in a state that might need reset
     if (isFirstOpenToday && dailyChallenge.currentDayState !== "pending") {
-      resetForNewDay();
+      // Check if the last completion was today
+      const wasCompletedToday = dailyChallenge.lastCompletedDate && 
+        new Date(dailyChallenge.lastCompletedDate).toDateString() === new Date().toDateString();
+      
+      if (!wasCompletedToday) {
+        console.log("🔄 Resetting for new day - previous challenge was not completed today");
+        resetForNewDay();
+      }
     }
-  }, [isFirstOpenToday, dailyChallenge.currentDayState, resetForNewDay]);
+  }, [isFirstOpenToday, dailyChallenge.currentDayState, dailyChallenge.lastCompletedDate, resetForNewDay]);
 
   // Add function to track app opens
   const trackAppOpen = useCallback(async () => {
@@ -308,6 +316,14 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
       console.error("Error tracking app open:", err);
     }
   }, [user?.uid, dailyChallenge, updateUser]);
+
+  // Track app open on first load
+  useEffect(() => {
+    if (user?.uid && !dailyChallenge.lastAppOpenDate) {
+      console.log("📱 First app open detected - tracking");
+      trackAppOpen();
+    }
+  }, [user?.uid, dailyChallenge.lastAppOpenDate, trackAppOpen]);
 
   return {
     // Data
