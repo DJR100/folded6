@@ -25,29 +25,40 @@ export default function RecoveryProgress() {
   const onContinue = async () => {
     const days = parseInt(recoveryDays) || 0;
     
-    if (days > 0) {
-      const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(days);
-      
-      // Update all counters simultaneously
-      await Promise.all([
-        updateUser("streak.start", streakStart),
-        updateUser("dailyChallenge", dailyChallenge),
-        updateUser("demographic.existingRecoveryDays", existingRecoveryDays)
-      ]);
-      
-      console.log(`✅ Initialized all recovery counters with ${days} days of existing progress`);
-    }
+    // Always initialize counters, even if days is 0
+    const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(days);
     
-    // Go to step 4 (motivational message)
+    // Update all counters simultaneously
+    await Promise.all([
+      updateUser("streak.start", streakStart),
+      updateUser("dailyChallenge", dailyChallenge),
+      updateUser("demographic.existingRecoveryDays", existingRecoveryDays)
+    ]);
+    
+    console.log(`✅ Initialized all recovery counters with ${days} days of existing progress`);
+    
+    // Small delay to ensure Firestore sync
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     setOnboarding(4);
     router.push("/onboarding/4");
   };
 
   const onJustStarting = async () => {
-    await updateUser("demographic.existingRecoveryDays", 0);
-    // No need to adjust counters - they'll start from zero naturally
+    // Use the same initialization logic with 0 days
+    const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(0);
     
-    // Go to step 4 (motivational message)
+    await Promise.all([
+      updateUser("streak.start", streakStart),
+      updateUser("dailyChallenge", dailyChallenge),
+      updateUser("demographic.existingRecoveryDays", 0)
+    ]);
+    
+    console.log("✅ Initialized all recovery counters for fresh start");
+    
+    // Small delay to ensure Firestore sync
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     setOnboarding(4);
     router.push("/onboarding/4");
   };

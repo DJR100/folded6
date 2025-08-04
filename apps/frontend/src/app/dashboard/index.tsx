@@ -125,7 +125,12 @@ function DashboardContent() {
   return (
     <DashboardLayout>
       <View className="flex justify-between flex-1">
-        <View className="flex flex-col gap-8 items-center py-8">
+        {/* Header with Folded branding */}
+        <View className="flex-row items-center justify-center pt-4 pb-2">
+          <Text className="text-lg font-medium text-white">Folded</Text>
+        </View>
+        
+        <View className="flex flex-col gap-8 items-center py-4">
           {/* Avatar */}
           <View className="w-1/2 aspect-square bg-accent rounded-full items-center ">
             <Text className="text-4xl mt-[40px]">👀</Text>
@@ -172,7 +177,7 @@ function DashboardContent() {
               style={{ 
                 height: 48,
                 backgroundColor: buttonConfig.backgroundColor || (dailyChallenge.currentDayState === "skipped" ? '#F59E0B' : '#3DF08B'),
-                opacity: buttonConfig.buttonOpacity || buttonConfig.opacity,
+                opacity: buttonConfig.buttonOpacity,
                 borderColor: buttonConfig.borderColor,
                 borderWidth: buttonConfig.borderWidth || 0,
                 // Add a subtle shadow for depth
