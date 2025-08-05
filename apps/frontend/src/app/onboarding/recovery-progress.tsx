@@ -25,17 +25,30 @@ export default function RecoveryProgress() {
   const onContinue = async () => {
     const days = parseInt(recoveryDays) || 0;
     
+    console.log(`🚀 Starting recovery counter initialization with ${days} days`);
+    
     // Always initialize counters, even if days is 0
     const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(days);
     
-    // Update all counters simultaneously
-    await Promise.all([
-      updateUser("streak.start", streakStart),
-      updateUser("dailyChallenge", dailyChallenge),
-      updateUser("demographic.existingRecoveryDays", existingRecoveryDays)
-    ]);
+    console.log('📝 About to update Firebase with:', {
+      'streak.start': streakStart,
+      'streak.start_readable': new Date(streakStart).toISOString(),
+      'dailyChallenge.streakCount': dailyChallenge.streakCount,
+      'existingRecoveryDays': existingRecoveryDays
+    });
+    
+    // 🎯 CRITICAL FIX: Update sequentially to avoid race conditions
+    console.log('🔧 Step 1: Setting streak.start...');
+    await updateUser("streak.start", streakStart);
+    
+    console.log('🔧 Step 2: Setting dailyChallenge...');
+    await updateUser("dailyChallenge", dailyChallenge);
+    
+    console.log('🔧 Step 3: Setting existingRecoveryDays...');
+    await updateUser("demographic.existingRecoveryDays", existingRecoveryDays);
     
     console.log(`✅ Initialized all recovery counters with ${days} days of existing progress`);
+    console.log(`🎯 Expected streak start: ${new Date(streakStart).toISOString()}`);
     
     // Small delay to ensure Firestore sync
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -45,14 +58,26 @@ export default function RecoveryProgress() {
   };
 
   const onJustStarting = async () => {
+    console.log('🚀 Starting fresh recovery (0 days)');
+    
     // Use the same initialization logic with 0 days
     const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(0);
     
-    await Promise.all([
-      updateUser("streak.start", streakStart),
-      updateUser("dailyChallenge", dailyChallenge),
-      updateUser("demographic.existingRecoveryDays", 0)
-    ]);
+    console.log('📝 About to update Firebase with fresh start:', {
+      'streak.start': streakStart,
+      'streak.start_readable': new Date(streakStart).toISOString(),
+      'dailyChallenge.streakCount': dailyChallenge.streakCount
+    });
+    
+    // 🎯 CRITICAL FIX: Update sequentially to avoid race conditions
+    console.log('🔧 Step 1: Setting streak.start...');
+    await updateUser("streak.start", streakStart);
+    
+    console.log('🔧 Step 2: Setting dailyChallenge...');
+    await updateUser("dailyChallenge", dailyChallenge);
+    
+    console.log('🔧 Step 3: Setting existingRecoveryDays...');
+    await updateUser("demographic.existingRecoveryDays", 0);
     
     console.log("✅ Initialized all recovery counters for fresh start");
     

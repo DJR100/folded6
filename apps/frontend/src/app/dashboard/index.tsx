@@ -32,7 +32,7 @@ function DashboardContent() {
   // Your existing streak calculation logic
   useEffect(() => {
     const calculateStreak = () => {
-      const streakMs = user?.streak.start ? Date.now() - user.streak.start : 0;
+      const streakMs = user?.streak?.start ? Date.now() - user.streak.start : 0;
       const milliseconds = Math.floor(Math.floor(streakMs % 1000) / 10);
       const seconds = Math.floor((streakMs / 1000) % 60);
       const minutes = Math.floor((streakMs / (1000 * 60)) % 60);
@@ -67,12 +67,19 @@ function DashboardContent() {
       }
     };
 
+    // 🔍 ONE-TIME DEBUG: Log what we're working with (only once per user change)
+    console.log('🎯 Dashboard Debug - User streak data:');
+    console.log(`  👤 User streak.start: ${user?.streak?.start}`);
+    console.log(`  👤 User streak.start readable: ${user?.streak?.start ? new Date(user.streak.start).toISOString() : 'undefined'}`);
+    console.log(`  📊 Daily challenge streak count: ${dailyChallenge.streakCount}`);
+    console.log(`  📊 Existing recovery days: ${user?.demographic?.existingRecoveryDays}`);
+
     calculateStreak();
-    const streakMs = user?.streak.start ? Date.now() - user.streak.start : 0;
+    const streakMs = user?.streak?.start ? Date.now() - user.streak.start : 0;
     const timeout = streakMs > 60 * 1000 ? 1000 : 33;
     const interval = setInterval(calculateStreak, timeout);
     return () => clearInterval(interval);
-  }, [user?.streak.start]);
+  }, [user?.streak?.start]);
 
   // Daily challenge button configuration
   const getButtonConfig = () => {

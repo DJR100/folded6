@@ -10,16 +10,24 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
 
   const data = event.data;
 
+  // 🔍 CHECK: See if user already exists (to avoid overwriting recovery progress)
+  const existingUserDoc = await db.collection("users").doc(data.uid).get();
+  const existingUser = existingUserDoc.data() as User | undefined;
+
+  console.log(`🔧 beforeUserCreated called for ${data.uid}`);
+  console.log(`📊 Existing user found: ${!!existingUser}`);
+  console.log(`📊 Existing streak.start: ${existingUser?.streak?.start}`);
+
   const user: User = {
     version: "0.0.0",
     uid: data.uid,
     email: data.email || null,
     displayName: data.displayName || null,
     photoURL: data.photoURL || null,
-    createdAt: Date.now(),
-    banking: null,
-    tier: 0,
-    demographic: {
+    createdAt: existingUser?.createdAt || Date.now(), // Preserve existing createdAt
+    banking: existingUser?.banking || null,
+    tier: existingUser?.tier || 0,
+    demographic: existingUser?.demographic || {
       gender: null,
       age: null,
       gambling: {
@@ -29,28 +37,32 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
         estimatedLifetimeLoss: null,
       },
     },
-    streak: {
+    // 🎯 CRITICAL FIX: Preserve existing streak data if it exists (don't overwrite recovery progress!)
+    streak: existingUser?.streak || {
       start: Date.now(),
     },
-    dailyChallenge: {
+    // 🎯 CRITICAL FIX: Preserve existing daily challenge data
+    dailyChallenge: existingUser?.dailyChallenge || {
       streakCount: 0,
       lastCompletedDate: null,
       currentWeek: [false, false, false, false, false, false, false],
       currentDayState: "pending",
     },
-    message: null,
-    guardian: {
+    message: existingUser?.message || null,
+    guardian: existingUser?.guardian || {
       guardianId: null,
       buddy: {
         userId: null,
       },
     },
-    messaging: {
+    messaging: existingUser?.messaging || {
       token: null,
       createdAt: null,
     },
   };
 
-  // Create a new user document in Firestore
+  console.log(`✅ Final streak.start being saved: ${user.streak.start} (${new Date(user.streak.start).toISOString()})`);
+
+  // Create or update user document in Firestore
   await db.collection("users").doc(data.uid).set(user);
 });

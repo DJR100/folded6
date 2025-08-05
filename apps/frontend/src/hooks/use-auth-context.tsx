@@ -164,6 +164,8 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
         if (!updatedUser) return;
         
         console.log("📡 Real-time user update received");
+        console.log(`🔍 Firebase streak.start: ${updatedUser.streak?.start} (${updatedUser.streak?.start ? new Date(updatedUser.streak.start).toISOString() : 'undefined'})`);
+        
         setUser(updatedUser);
         
         // Update local state when database changes in real-time
@@ -174,39 +176,39 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
           setOnboarding("DONE");
           setPostOnboarding("DONE");
         }
-        
-        // COMMENTED OUT FOR V1
-        // setBankConnected(!!updatedUser.banking?.accessToken);
       },
     );
     
     return () => {
       snapshotListener();
     };
-  }, [user?.uid]); // ✅ Watch user.uid to avoid infinite loops
+  }, [user?.uid, user?.tier]); // ✅ Also watch user.tier to refresh listener when onboarding completes
 
   const updateUser = async (dotkey: string, value: any) => {
-    // dotkey is like "demographic.age" or "tier"
     if (!user) return;
 
     const keys = dotkey.split(".");
-    const newUser = _.cloneDeep(user);
-    let current = newUser;
+    
+    // 🎯 CRITICAL FIX: Build update object for merge instead of overwriting entire document
+    const updateObject: any = {};
+    let current = updateObject;
+    
     for (let i = 0; i < keys.length - 1; i++) {
-      const k = keys[i] as keyof typeof current;
-      if (!current[k]) {
-        // @ts-expect-error Expected typescript error
-        current[k] = {} as any;
-      }
-      current = current[k] as any;
+      current[keys[i]] = {};
+      current = current[keys[i]];
     }
-    const lastKey = keys[keys.length - 1] as keyof typeof current;
-    // @ts-expect-error Expected typescript error
-    current[lastKey] = value as any;
+    current[keys[keys.length - 1]] = value;
 
-    setUser(newUser);
+    console.log(`🔧 updateUser: ${dotkey} =`, value);
+    console.log(`📝 Update object:`, updateObject);
 
-    await setDoc(doc(db, "users", user.uid), newUser);
+    // Use merge: true to avoid overwriting other fields
+    await setDoc(doc(db, "users", user.uid), updateObject, { merge: true });
+
+    console.log(`✅ Firebase merge completed for ${dotkey}`);
+    
+    // Don't update local state - let the real-time listener handle it
+    // This prevents race conditions and ensures we always have the latest data
   };
 
   const value: AuthContext = {
