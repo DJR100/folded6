@@ -109,7 +109,7 @@ export function PhotoCapture({
         <View 
           className="rounded-3xl p-8 justify-center"
           style={{
-            backgroundColor: '#2DD4BF', // Teal color
+            backgroundColor: '#8B5CF6', // Changed from teal to purple
             minHeight: 500,
             flex: 1,
           }}

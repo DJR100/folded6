@@ -31,9 +31,17 @@ export const PanicButton = () => {
 
   const onPressRelapse = async () => {
     if (!user) return;
+    
+    // Reset both streak.start AND daily challenge data
     await updateDoc(doc(db, "users", user.uid), {
       "streak.start": Date.now(),
+      "dailyChallenge.streakCount": 0,
+      "dailyChallenge.lastCompletedDate": null,
+      "dailyChallenge.currentWeek": [false, false, false, false, false, false, false],
+      "dailyChallenge.currentDayState": "pending"
     });
+    
+    console.log("🔄 Reset streak and daily challenge data due to relapse");
     bottomSheetRef.current?.close();
   };
   return (

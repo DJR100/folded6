@@ -16,7 +16,7 @@ export function DailyChallengeIntro({
         <View 
           className="rounded-3xl p-8 justify-center"
           style={{
-            backgroundColor: '#3DF08B', // Folded green color
+            backgroundColor: '#8B5CF6', // Changed from green to purple
             minHeight: 500, // Much larger
             flex: 1, // Take up more space
           }}
