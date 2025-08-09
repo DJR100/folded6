@@ -26,7 +26,7 @@ export default function Index() {
           <View className="w-6" />
           
           {/* Centered Title */}
-          <Text className="text-lg font-medium">Folded.</Text>
+          <Text className="text-lg font-medium">Folded</Text>
           
           {/* Settings Gear - Right aligned with margin */}
           <View style={{ marginRight: 6 }}>

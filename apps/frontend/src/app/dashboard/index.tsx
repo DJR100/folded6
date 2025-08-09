@@ -10,6 +10,36 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { DailyChallengeProvider, useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 import { cn } from "@/lib/cn";
 import { MoneySavedTicker } from "@/components/money-saved-ticker";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { Image } from "expo-image";
+import { ProfileEditModal } from "@/components/profile-edit-modal";
+
+const ProfileHeaderInline = React.memo(function ProfileHeaderInline() {
+  const { user } = useAuthContext();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
+
+  return (
+    <View className="items-center">
+      <View className="w-1/2 aspect-square rounded-full border-2 border-gray-400 items-center justify-center overflow-hidden" style={{ borderColor: "#9CA3AF" }}>
+        {user?.photoURL ? (
+          <Image source={{ uri: user.photoURL }} style={{ width: "100%", height: "100%" }} contentFit="cover" transition={0} cachePolicy="memory-disk" />
+        ) : (
+          <Text className="text-4xl mt-[40px]">👤</Text>
+        )}
+      </View>
+
+      <View className="flex-row items-center mt-3">
+        <Text className="text-lg font-semibold">{displayName}</Text>
+        <TouchableOpacity onPress={() => setIsModalVisible(true)} style={{ marginLeft: 6 }}>
+          <AntDesign name="edit" size={18} color="white" style={{ opacity: 0.6 }} />
+        </TouchableOpacity>
+      </View>
+
+      <ProfileEditModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+    </View>
+  );
+});
 
 // Internal component that uses the daily challenge context
 function DashboardContent() {
@@ -133,18 +163,23 @@ function DashboardContent() {
     <DashboardLayout>
       <View className="flex justify-between flex-1">
         {/* Header with Folded branding */}
-        <View className="flex-row items-center justify-center pt-4 pb-2">
-          <Text className="text-lg font-medium text-white">Folded</Text>
+        <View className="flex-row items-center justify-between mb-4">
+          {/* Left spacer to balance the gear width */}
+          <View className="w-8" />
+          {/* Centered title */}
+          <Text className="text-lg font-medium">Folded</Text>
+          {/* Right gear, same width as left spacer to keep title perfectly centered */}
+          <View className="w-8 items-end pr-1">
+            <AntDesign name="setting" size={24} color="white" style={{ opacity: 0.4 }} />
+          </View>
         </View>
         
-        <View className="flex flex-col gap-8 items-center py-4">
+        <View className="flex flex-col gap-6 items-center py-3">
           {/* Avatar */}
-          <View className="w-1/2 aspect-square bg-accent rounded-full items-center ">
-            <Text className="text-4xl mt-[40px]">👀</Text>
-          </View>
+          <ProfileHeaderInline />
 
           <View className="flex flex-col gap-2 items-center">
-            <Text>Bet Free:</Text>
+            <Text className="text-base font-medium">Bet Free:</Text>
             {/* Streak duration */}
             <View className="flex flex-row gap-4 items-baseline">
               <View className="flex flex-row gap-1 items-baseline">
@@ -163,15 +198,15 @@ function DashboardContent() {
             </View>
             {/* Money Saved Ticker */}
             {usdPerMs && quitTimestampMs && (
-              <View className="mt-2 items-center">
-                <Text>Money Saved:</Text>
+              <View className="mt-1 items-center">
+                <Text className="text-base font-medium">Money Saved:</Text>
                 <MoneySavedTicker usdPerMs={usdPerMs} quitTimestampMs={quitTimestampMs} />
               </View>
             )}
           </View>
 
           {/* Daily Challenge Button with updated styling */}
-          <View className="w-full px-4 mt-6">
+          <View className="w-full px-4 mt-3">
             <TouchableOpacity
               onPress={() => {
                 if (!buttonConfig.disabled) {

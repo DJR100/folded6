@@ -415,14 +415,15 @@ export const PanicButton = () => {
                 Only reset if you're certain. This action cannot be undone.
               </Text>
               
-              <View className="space-y-2">
+              <View className="space-y-6">
                 <Button
                   text={isResetting ? "Resetting..." : "Yes, reset my progress"}
                   variant="danger"
                   disabled={isResetting}
                   onPress={handleConfirmRelapse}
                 />
-                <Button
+                <View className="mt-4"></View>
+                <Button 
                   text="Cancel"
                   variant="outline"
                   onPress={() => {
