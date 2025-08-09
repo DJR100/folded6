@@ -7,10 +7,12 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 import { DashboardLayout } from "@/components/layouts/dashboard";
 import { ProfileEditModal } from "@/components/profile-edit-modal";
 import { Text, View } from "@/components/ui";
+import { FeedbackModal } from "@/components/feedbackModal";
 
 export default function Index() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { user } = useAuthContext();
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
 
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
@@ -71,12 +73,47 @@ export default function Index() {
           </View>
         </View>
 
-        {/* You could add other profile-specific content here */}
+        {/* Feedback Button */}
+        <View className="w-full px-4 mt-8">
+          <TouchableOpacity
+            onPress={() => setFeedbackVisible(true)}
+            className="w-full rounded-lg flex-row items-center justify-center"
+            style={{
+              height: 48,
+              backgroundColor: "#16A34A", // darker green for better contrast
+              opacity: 1.0,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 2,
+            }}
+          >
+            <Text
+              className="font-medium text-center"
+              style={{
+                color: "#FFFFFF",
+                opacity: 1.0,
+                fontSize: 16,
+                fontWeight: "700",
+                textShadowColor: "rgba(0, 0, 0, 0.55)",
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 3,
+              }}
+            >
+              Send Feedback
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ProfileEditModal
         visible={isModalVisible}
         onClose={closeModal}
+      />
+      <FeedbackModal
+        visible={feedbackVisible}
+        onClose={() => setFeedbackVisible(false)}
       />
     </DashboardLayout>
   );
