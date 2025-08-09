@@ -188,11 +188,20 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
       // Check if we need to reset streak
       const resetStreak = shouldResetStreak;
       
+      // Check if it's a new week (Monday)
+      const today = new Date();
+      const isMonday = today.getDay() === 1;
+      
+      // Only reset currentWeek if it's Monday, otherwise preserve it
+      const shouldResetWeek = isMonday;
+      
       const updatedData: DailyChallengeData = {
         streakCount: resetStreak ? 0 : dailyChallenge.streakCount,
         lastCompletedDate: dailyChallenge.lastCompletedDate,
-        lastAppOpenDate: dailyChallenge.lastAppOpenDate, // Keep app open tracking
-        currentWeek: [false, false, false, false, false, false, false], // Reset week
+        lastAppOpenDate: dailyChallenge.lastAppOpenDate,
+        currentWeek: shouldResetWeek 
+          ? [false, false, false, false, false, false, false] // Reset only on Monday
+          : dailyChallenge.currentWeek, // Preserve current week progress
         currentDayState: "pending"
       };
 
@@ -200,8 +209,11 @@ export function useDailyChallenge(): UseDailyChallengeReturn {
 
       // Analytics for streak reset
       if (resetStreak) {
-        // TODO: Fire analytics event - streak_reset
         console.log("🔥 Streak reset due to missed day");
+      }
+      
+      if (shouldResetWeek) {
+        console.log("�� New week started - resetting week progress");
       }
 
     } catch (err) {

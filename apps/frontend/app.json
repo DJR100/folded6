@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "Folded",
+    "slug": "folded",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "folded",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
