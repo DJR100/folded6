@@ -121,14 +121,26 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
           currentWeek: [false, false, false, false, false, false, false],
           currentDayState: "pending"
         };
-        // ... save to database
+        // Persist default daily challenge data
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          { dailyChallenge: defaultDailyChallengeData },
+          { merge: true }
+        );
+        console.log("✅ Initialized dailyChallenge for new user");
       } else if (!('lastAppOpenDate' in user.dailyChallenge)) {
         // Existing user - add missing field
         const updatedData = {
           ...user.dailyChallenge,
           lastAppOpenDate: null // Initialize for existing users
         };
-        // ... save to database
+        // Persist addition of lastAppOpenDate for existing users
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          { dailyChallenge: updatedData },
+          { merge: true }
+        );
+        console.log("🔧 Added lastAppOpenDate to existing user's dailyChallenge");
       }
     };
 

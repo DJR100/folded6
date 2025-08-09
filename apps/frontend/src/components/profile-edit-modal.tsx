@@ -118,11 +118,12 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         console.log('✅ Username updated');
       }
 
-      // TODO: Add image upload in next step
+      // Upload and persist profile image if changed
       if (profileImageUri && profileImageUri !== user.photoURL) {
-        console.log('📤 Would upload image:', profileImageUri);
-        // await uploadProfileImage(profileImageUri, user.uid);
-        Alert.alert('Info', 'Image upload will be implemented in next step');
+        console.log('📤 Uploading profile image:', profileImageUri);
+        const downloadURL = await uploadProfileImage(profileImageUri, user.uid);
+        await updateUser('photoURL', downloadURL);
+        console.log('✅ Photo URL saved to user document');
       }
 
       Alert.alert('Success', 'Profile updated successfully!');
