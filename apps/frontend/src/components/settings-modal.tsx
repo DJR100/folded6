@@ -25,6 +25,7 @@ export function SettingsModal({
           <Text variant="h3" className="text-center mb-4">Settings</Text>
 
           <View className="flex gap-3">
+            {/*
             <Button
               onPress={async () => {
                 await signOut();
@@ -41,6 +42,9 @@ export function SettingsModal({
               }}
               text="Fake gamble transaction"
             />
+            */}
+
+            <Text className="text-center opacity-60">Coming soon</Text>
 
             <Button variant="secondary" onPress={onClose} text="Close" />
           </View>
