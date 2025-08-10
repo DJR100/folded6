@@ -1,6 +1,6 @@
 import * as banking from "./functions/banking";
 import * as notifications from "./functions/notifications";
-import * as test from "./functions/test";
 import * as user from "./functions/user";
+import * as feedback from "./functions/feedback";
 
-export { banking, notifications, test, user };
+export { banking, notifications, user, feedback };

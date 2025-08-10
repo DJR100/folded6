@@ -3,6 +3,9 @@ import React, { useMemo, useState } from "react";
 import { Modal, TouchableOpacity, Alert } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Button, Input, Text, View } from "@/components/ui";
+import { db } from "@/lib/firebase";
+import { addDoc, collection, serverTimestamp } from "@react-native-firebase/firestore";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 type Mode = "menu" | "bug" | "general" | "feature";
 
@@ -37,6 +40,22 @@ export function FeedbackModal({
   const [featureIdea, setFeatureIdea] = useState("");
   const [featureDesc, setFeatureDesc] = useState("");
   const [featureImpact, setFeatureImpact] = useState<"nice" | "helpful" | "must" | null>(null);
+
+  const { user } = useAuthContext();
+
+  const submitFeedback = async (
+    type: "bug" | "general" | "feature",
+    payload: Record<string, any>
+  ) => {
+    if (!user?.uid) throw new Error("Must be signed in to submit feedback");
+    await addDoc(collection(db, "feedback"), {
+      type,
+      ...payload,
+      userId: user.uid,
+      email: user.email ?? null,
+      createdAt: serverTimestamp(),
+    });
+  };
 
   const resetAndClose = () => {
     setMode("menu");
@@ -97,7 +116,8 @@ export function FeedbackModal({
 
               <Button
                 text="Send bug"
-                onPress={() => {
+                onPress={async () => {
+                  await submitFeedback("bug", { what: bugWhat, trying: bugTrying });
                   Alert.alert("Thanks!", "Bug report received ✅");
                   resetAndClose();
                 }}
@@ -135,7 +155,8 @@ export function FeedbackModal({
 
               <Button
                 text="Send feedback"
-                onPress={() => {
+                onPress={async () => {
+                  await submitFeedback("general", { sentiment, text: generalText });
                   Alert.alert("Appreciate it", "Logged! 🙌");
                   resetAndClose();
                   setGeneralPHIndex((i) => (i + 1) % generalPHs.length);
@@ -188,7 +209,12 @@ export function FeedbackModal({
 
               <Button
                 text="Send idea"
-                onPress={() => {
+                onPress={async () => {
+                  await submitFeedback("feature", {
+                    idea: featureIdea,
+                    description: featureDesc,
+                    impact: featureImpact,
+                  });
                   Alert.alert("Great idea", "Saved! ✨");
                   resetAndClose();
                 }}
