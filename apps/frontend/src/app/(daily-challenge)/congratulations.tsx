@@ -6,7 +6,7 @@ import { View } from "@/components/ui";
 export default function CongratulationsScreen() {
   const handleClose = () => {
     // Navigate back to profile page
-    router.replace("/dashboard/profile");
+    router.replace("/dashboard");
   };
 
   return (

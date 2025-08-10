@@ -27,7 +27,7 @@ export default function PhotoCaptureScreen() {
     try {
       await skipChallenge();
       // Navigate back to profile page - challenge skipped (no congratulations)
-      router.replace("/dashboard/profile");
+      router.replace("/dashboard");
     } catch (error) {
       console.error("Error skipping challenge:", error);
     }
