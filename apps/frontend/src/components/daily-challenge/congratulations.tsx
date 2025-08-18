@@ -34,30 +34,33 @@ export function Congratulations({ onClose }: CongratulationsProps) {
 
   const onShare = async () => {
     try {
-      // Lazy-load expo-sharing so the app doesn’t crash if the native module isn’t in the current dev client
-      let Sharing: typeof import("expo-sharing") | null = null;
+      // Lazy-load expo-sharing and support both default and named exports
+      let isAvailableAsync: undefined | (() => Promise<boolean>);
+      let shareAsync: undefined | ((uri: string, options?: any) => Promise<void>);
+
       try {
-        Sharing = await import("expo-sharing");
+        const mod: any = await import("expo-sharing");
+        isAvailableAsync = mod?.isAvailableAsync ?? mod?.default?.isAvailableAsync;
+        shareAsync = mod?.shareAsync ?? mod?.default?.shareAsync;
       } catch {
-        Sharing = null;
+        // Module not available; fall back to text share
       }
 
-      const canShareImage = Sharing && (await Sharing.isAvailableAsync());
+      const canShareImage =
+        !!isAvailableAsync && !!shareAsync && (await isAvailableAsync());
+
       if (canShareImage && cardRef.current?.capture) {
         setSharing(true);
         try {
           const uri = await cardRef.current.capture();
           if (uri) {
-            await Sharing!.shareAsync(uri, {
+            await shareAsync!(uri, {
               mimeType: "image/png",
               UTI: "public.png",
               dialogTitle: "Share your recovery progress",
             });
-            setSharing(false);
             return;
           }
-        } catch {
-          // fall back to text share below
         } finally {
           setSharing(false);
         }
@@ -106,8 +109,17 @@ export function Congratulations({ onClose }: CongratulationsProps) {
             <ViewShot ref={cardRef} options={{ format: "png", quality: 1 }}>
               <View
                 className="rounded-3xl p-6 items-center w-full"
-                style={{ backgroundColor: '#FFFFFF' }}
+                style={{ backgroundColor: '#FFFFFF', position: 'relative' }}
               >
+                {/* Small brand badge - top right */}
+                <View style={{ position: 'absolute', top: 10, right: 10, opacity: 0.7 }}>
+                  <Image
+                    source={require("@/assets/images/favicon3.png")}
+                    style={{ width: 16, height: 16, borderRadius: 3 }}
+                    contentFit="contain"
+                  />
+                </View>
+
                 <View className="w-24 h-24 rounded-full border-2 overflow-hidden items-center justify-center" style={{ borderColor: '#8B5CF6' }}>
                   {user?.photoURL ? (
                     <Image
@@ -185,7 +197,7 @@ export function Congratulations({ onClose }: CongratulationsProps) {
         </View>
       </View>
 
-      <View className="h-24" />
+      <View className="h-18" />
     </View>
   );
 }
