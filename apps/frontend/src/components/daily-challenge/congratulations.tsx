@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { TouchableOpacity, Share, Alert } from "react-native";
 import { Image } from "expo-image";
 import { FontAwesome } from "@expo/vector-icons";
+import ViewShot from "react-native-view-shot";
 
 import { Text, View } from "@/components/ui";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -28,22 +29,53 @@ export function Congratulations({ onClose }: CongratulationsProps) {
   }, [dailyChallenge?.streakCount, user?.streak?.start]);
 
   const isFirstDay = days === 1;
+  const cardRef = useRef<any>(null);
+  const [sharing, setSharing] = useState(false);
 
   const onShare = async () => {
     try {
+      // Lazy-load expo-sharing so the app doesn’t crash if the native module isn’t in the current dev client
+      let Sharing: typeof import("expo-sharing") | null = null;
+      try {
+        Sharing = await import("expo-sharing");
+      } catch {
+        Sharing = null;
+      }
+
+      const canShareImage = Sharing && (await Sharing.isAvailableAsync());
+      if (canShareImage && cardRef.current?.capture) {
+        setSharing(true);
+        try {
+          const uri = await cardRef.current.capture();
+          if (uri) {
+            await Sharing!.shareAsync(uri, {
+              mimeType: "image/png",
+              UTI: "public.png",
+              dialogTitle: "Share your recovery progress",
+            });
+            setSharing(false);
+            return;
+          }
+        } catch {
+          // fall back to text share below
+        } finally {
+          setSharing(false);
+        }
+      }
+
       const message = isFirstDay
-        ? `${displayName} just started the path to recovery — Day 1.`
+        ? "Day 1 - Taking the first step towards recovery!"
         : `${displayName} has been bet free for ${days} days!`;
       await Share.share({ message });
     } catch (e) {
       console.error(e);
       Alert.alert("Share failed", "Something went wrong while sharing.");
+      setSharing(false);
     }
   };
 
   return (
     <View className="flex-1 bg-background">
-      {/* Main Content Card - Consistent with intro/photo capture */}
       <View className="flex-1 px-4">
         <View 
           className="rounded-3xl p-8 justify-center"
@@ -53,7 +85,6 @@ export function Congratulations({ onClose }: CongratulationsProps) {
             flex: 1,
           }}
         >
-          {/* Congratulations Text - All centered */}
           <View className="mb-8 items-center">
             <Text 
               className="text-white text-2xl font-bold text-center leading-tight"
@@ -70,39 +101,41 @@ export function Congratulations({ onClose }: CongratulationsProps) {
             </Text>
           </View>
 
-          {/* Visual Preview Card (no capture yet) */}
+          {/* Visual Preview Card (capturable) */}
           <View className="items-center mb-6">
-            <View
-              className="rounded-3xl p-6 items-center w-full"
-              style={{ backgroundColor: '#FFFFFF' }}
-            >
-              <View className="w-24 h-24 rounded-full border-2 overflow-hidden items-center justify-center" style={{ borderColor: '#8B5CF6' }}>
-                {user?.photoURL ? (
-                  <Image
-                    source={{ uri: user.photoURL }}
-                    style={{ width: '100%', height: '100%' }}
-                    contentFit="cover"
-                    transition={0}
-                    cachePolicy="memory-disk"
-                  />
-                ) : (
-                  <Text className="text-4xl">👤</Text>
-                )}
-              </View>
+            <ViewShot ref={cardRef} options={{ format: "png", quality: 1 }}>
+              <View
+                className="rounded-3xl p-6 items-center w-full"
+                style={{ backgroundColor: '#FFFFFF' }}
+              >
+                <View className="w-24 h-24 rounded-full border-2 overflow-hidden items-center justify-center" style={{ borderColor: '#8B5CF6' }}>
+                  {user?.photoURL ? (
+                    <Image
+                      source={{ uri: user.photoURL }}
+                      style={{ width: '100%', height: '100%' }}
+                      contentFit="cover"
+                      transition={0}
+                      cachePolicy="memory-disk"
+                    />
+                  ) : (
+                    <Text className="text-4xl">👤</Text>
+                  )}
+                </View>
 
-              <Text className="text-lg font-semibold mt-4" style={{ color: '#000000' }}>
-                {displayName}
-              </Text>
+                <Text className="text-lg font-semibold mt-4" style={{ color: '#000000' }}>
+                  {displayName}
+                </Text>
 
-              <View className="mt-4 items-center">
-                <Text className="text-5xl font-extrabold" style={{ color: '#000000' }}>
-                  {days}
-                </Text>
-                <Text className="mt-1 text-center" style={{ color: 'rgba(0,0,0,0.7)' }}>
-                  {isFirstDay ? "Day 1 - Taking the first step towards recovery!" : "days bet‑free"}
-                </Text>
+                <View className="mt-4 items-center">
+                  <Text className="text-5xl font-extrabold" style={{ color: '#000000' }}>
+                    {days}
+                  </Text>
+                  <Text className="mt-1 text-center" style={{ color: 'rgba(0,0,0,0.7)' }}>
+                    {isFirstDay ? "Day 1 - Taking the first step towards recovery!" : "days bet‑free"}
+                  </Text>
+                </View>
               </View>
-            </View>
+            </ViewShot>
           </View>
 
           {/* Share Button */}
@@ -122,14 +155,14 @@ export function Congratulations({ onClose }: CongratulationsProps) {
                   className="text-center font-semibold text-lg"
                   style={{ color: '#000000' }}
                 >
-                  Share on
+                  {sharing ? "Sharing…" : "Share on"}
                 </Text>
                 <FontAwesome name="whatsapp" size={20} color="#000000" />
               </View>
             </TouchableOpacity>
           </View>
 
-          {/* Close Button - Centered like intro button */}
+          {/* Close Button */}
           <View className="items-center">
             <TouchableOpacity
               onPress={onClose}
@@ -152,8 +185,7 @@ export function Congratulations({ onClose }: CongratulationsProps) {
         </View>
       </View>
 
-      {/* Bottom spacing for navigation bar */}
-      <View className="h-18" />
+      <View className="h-24" />
     </View>
   );
 }
