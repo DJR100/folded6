@@ -7,6 +7,7 @@ import ViewShot from "react-native-view-shot";
 import { Text, View } from "@/components/ui";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
+import { logEvent } from "@/lib/analytics";
 
 interface CongratulationsProps {
   onClose: () => void;
@@ -33,47 +34,61 @@ export function Congratulations({ onClose }: CongratulationsProps) {
   const [sharing, setSharing] = useState(false);
 
   const onShare = async () => {
-    try {
-      // Lazy-load expo-sharing and support both default and named exports
-      let isAvailableAsync: undefined | (() => Promise<boolean>);
-      let shareAsync: undefined | ((uri: string, options?: any) => Promise<void>);
+    let method: "image" | "text" = "text";
+    let outcome: "shared" | "dismissed" | "unknown" | "error" = "unknown";
 
+    try {
+      // Decide sharing method once
+      let isAvailableAsync: undefined | (() => Promise<boolean>);
+      let shareImageAsync: undefined | ((uri: string, options?: any) => Promise<void>);
       try {
         const mod: any = await import("expo-sharing");
         isAvailableAsync = mod?.isAvailableAsync ?? mod?.default?.isAvailableAsync;
-        shareAsync = mod?.shareAsync ?? mod?.default?.shareAsync;
-      } catch {
-        // Module not available; fall back to text share
-      }
+        shareImageAsync = mod?.shareAsync ?? mod?.default?.shareAsync;
+      } catch {}
 
       const canShareImage =
-        !!isAvailableAsync && !!shareAsync && (await isAvailableAsync());
+        !!isAvailableAsync && !!shareImageAsync && (await isAvailableAsync());
 
       if (canShareImage && cardRef.current?.capture) {
+        method = "image";
         setSharing(true);
         try {
           const uri = await cardRef.current.capture();
           if (uri) {
-            await shareAsync!(uri, {
+            await shareImageAsync!(uri, {
               mimeType: "image/png",
               UTI: "public.png",
               dialogTitle: "Share your recovery progress",
             });
-            return;
+            outcome = "unknown"; // expo-sharing doesn't report completion
+          } else {
+            outcome = "error";
+            method = "text"; // fall back
           }
+        } catch {
+          outcome = "error";
+          method = "text"; // fall back
         } finally {
           setSharing(false);
         }
       }
 
-      const message = isFirstDay
-        ? "Day 1 - Taking the first step towards recovery!"
-        : `${displayName} has been bet free for ${days} days!`;
-      await Share.share({ message });
-    } catch (e) {
-      console.error(e);
-      Alert.alert("Share failed", "Something went wrong while sharing.");
-      setSharing(false);
+      if (method === "text") {
+        const message = isFirstDay
+          ? "Day 1 - Taking the first step towards recovery!"
+          : `${displayName} has been bet free for ${days} days!`;
+        try {
+          const result: any = await Share.share({ message });
+          if (result?.action === Share.sharedAction) outcome = "shared";
+          else if (result?.action === Share.dismissedAction) outcome = "dismissed";
+          else outcome = "unknown";
+        } catch {
+          outcome = "error";
+        }
+      }
+    } finally {
+      await logEvent("share", { method, outcome, isFirstDay, days });
     }
   };
 
