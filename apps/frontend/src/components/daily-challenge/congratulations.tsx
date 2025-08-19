@@ -32,6 +32,7 @@ export function Congratulations({ onClose }: CongratulationsProps) {
   const isFirstDay = days === 1;
   const cardRef = useRef<any>(null);
   const [sharing, setSharing] = useState(false);
+  const CARD_SIZE = 250; // dp size of on-screen preview (output will be scaled up)
 
   const onShare = async () => {
     let method: "image" | "text" = "text";
@@ -121,10 +122,19 @@ export function Congratulations({ onClose }: CongratulationsProps) {
 
           {/* Visual Preview Card (capturable) */}
           <View className="items-center mb-6">
-            <ViewShot ref={cardRef} options={{ format: "png", quality: 1 }}>
+            <ViewShot
+              ref={cardRef}
+              options={{ format: "png", quality: 1, width: 1080, height: 1080 }}
+              style={{ width: CARD_SIZE, height: CARD_SIZE }}
+            >
               <View
-                className="rounded-3xl p-6 items-center w-full"
-                style={{ backgroundColor: '#FFFFFF', position: 'relative' }}
+                className="rounded-3xl p-6 items-center"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  position: 'relative',
+                  width: CARD_SIZE,
+                  height: CARD_SIZE,
+                }}
               >
                 {/* Small brand badge - top right */}
                 <View style={{ position: 'absolute', top: 10, right: 10, opacity: 0.7 }}>
