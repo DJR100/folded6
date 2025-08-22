@@ -13,7 +13,7 @@ import { MoneySavedTicker } from "@/components/money-saved-ticker";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
 import { ProfileEditModal } from "@/components/profile-edit-modal";
-import { SettingsModal } from "@/components/settings-modal";
+
 
 const ProfileHeaderInline = React.memo(function ProfileHeaderInline() {
   const { user } = useAuthContext();
@@ -44,9 +44,8 @@ const ProfileHeaderInline = React.memo(function ProfileHeaderInline() {
 
 // Internal component that uses the daily challenge context
 function DashboardContent() {
-  const { user } = useAuthContext();
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  
+  const { user } = useAuthContext()
+
   // Connect to daily challenge system
   const { 
     dailyChallenge, 
@@ -172,12 +171,12 @@ function DashboardContent() {
           <Text className="text-lg font-medium">Folded</Text>
           {/* Right gear, same width as left spacer to keep title perfectly centered */}
           <View className="w-8 items-end pr-1">
-            <TouchableOpacity onPress={() => setIsSettingsVisible(true)} hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+            <TouchableOpacity onPress={() => router.push("/settings")} hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}>
               <AntDesign name="setting" size={24} color="white" style={{ opacity: 0.4 }} />
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <View className="flex flex-col gap-6 items-center py-3">
           {/* Avatar */}
           <ProfileHeaderInline />
@@ -259,7 +258,6 @@ function DashboardContent() {
         </View>
         <PanicButton />
       </View>
-      <SettingsModal visible={isSettingsVisible} onClose={() => setIsSettingsVisible(false)} />
     </DashboardLayout>
   );
 }
