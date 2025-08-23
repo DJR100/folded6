@@ -13,8 +13,8 @@ const ChevronRight = () => (
 );
 
 // TODO: replace with your real policy URLs
-const PRIVACY_URL = "https://folded.so/privacy";
-const TERMS_URL = "https://folded.so/terms";
+const PRIVACY_URL = "https://folded.app/privacy";
+const TERMS_URL = "https://folded.app/terms";
 
 export default function AccountSettings() {
   const { user, signOut } = useAuthContext();
