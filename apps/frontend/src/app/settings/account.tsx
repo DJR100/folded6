@@ -1,9 +1,24 @@
-import { TouchableOpacity } from "react-native";
+import React from "react";
+import { Alert, TouchableOpacity, Share } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
+import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { Text, View } from "@/components/ui";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import * as Clipboard from "expo-clipboard";
+
+const ChevronRight = () => (
+  <AntDesign name="right" size={16} color="white" style={{ opacity: 0.5 }} />
+);
+
+// TODO: replace with your real policy URLs
+const PRIVACY_URL = "https://folded.so/privacy";
+const TERMS_URL = "https://folded.so/terms";
 
 export default function AccountSettings() {
+  const { user, signOut } = useAuthContext();
+
   return (
     <View className="flex-1 bg-background">
       <View className="flex-row items-center gap-2 px-4 py-3">
@@ -14,7 +29,101 @@ export default function AccountSettings() {
       </View>
 
       <View className="px-4">
-        <Text className="opacity-70">Coming soon</Text>
+        <Text className="opacity-70 mb-2">PRIVACY</Text>
+
+        <TouchableOpacity
+          className="bg-white/5 rounded-xl px-4 py-4 mb-3"
+          onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3">
+              <Feather name="shield" size={16} color="white" />
+              <Text className="text-white">Privacy Policy</Text>
+            </View>
+            <ChevronRight />
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="bg-white/5 rounded-xl px-4 py-4 mb-6"
+          onPress={() => WebBrowser.openBrowserAsync(TERMS_URL)}
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3">
+              <Feather name="file-text" size={16} color="white" />
+              <Text className="text-white">Terms of Service</Text>
+            </View>
+            <ChevronRight />
+          </View>
+        </TouchableOpacity>
+
+        <Text className="opacity-70 mb-2">SESSION</Text>
+
+        <View className="bg-white/5 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between">
+          <View className="flex-row items-center gap-3">
+            <Feather name="user" size={16} color="white" />
+            <Text className="text-white" selectable>{user?.email ?? "—"}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={async () => {
+              if (user?.email) {
+                await Clipboard.setStringAsync(user.email);
+                Alert.alert("Copied!", "User info copied to clipboard");
+              }
+            }}
+          >
+            <Feather name="copy" size={16} color="white" style={{ opacity: 0.8 }} />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          className="bg-white/5 rounded-xl px-4 py-4 mb-6"
+          onPress={() =>
+            Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Sign Out",
+                style: "destructive",
+                onPress: async () => {
+                  await signOut();
+                  router.replace("/");
+                },
+              },
+            ])
+          }
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3">
+              <Feather name="log-out" size={16} color="#EF4444" />
+              <Text className="text-[#EF4444]">Sign Out</Text>
+            </View>
+            <ChevronRight />
+          </View>
+        </TouchableOpacity>
+
+        <Text className="opacity-70 mb-2">DANGER</Text>
+
+        <TouchableOpacity
+          className="bg-white/5 rounded-xl px-4 py-4"
+          onPress={() =>
+            Alert.alert(
+              "Delete Account",
+              "This is permanent and cannot be undone.",
+              [
+                { text: "Cancel", style: "cancel" },
+                { text: "Continue", style: "destructive", onPress: () => console.log("TODO: delete account flow") },
+              ]
+            )
+          }
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3">
+              <Feather name="trash-2" size={16} color="#EF4444" />
+              <Text className="text-[#EF4444]">Delete Account</Text>
+            </View>
+            <ChevronRight />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
