@@ -1,5 +1,6 @@
 import { User } from "@folded/types";
 import { beforeUserCreated as beforeUserCreatedCallback } from "firebase-functions/v2/identity";
+import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { db } from "../common/firebase";
 
@@ -65,4 +66,54 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
 
   // Create or update user document in Firestore
   await db.collection("users").doc(data.uid).set(user);
+});
+
+// Callable: reserve username and set profile fields atomically
+export const reserveUsername = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "User is not authenticated");
+
+  const { username, firstName } = (request.data || {}) as {
+    username?: string;
+    firstName?: string | null;
+  };
+  if (!username || typeof username !== "string") {
+    throw new HttpsError("invalid-argument", "username is required");
+  }
+
+  const normalized = username.trim().toLowerCase();
+  if (!/^[a-z0-9_\.]{3,20}$/.test(normalized)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "username must be 3-20 chars, a-z, 0-9, _ or .",
+    );
+  }
+
+  await db.runTransaction(async (tx) => {
+    const unameRef = db.collection("usernames").doc(normalized);
+    const snap = await tx.get(unameRef);
+
+    if (snap.exists && (snap.data() as any)?.uid !== uid) {
+      throw new HttpsError("already-exists", "Username is already taken");
+    }
+
+    // Reserve/claim the username
+    tx.set(unameRef, { uid, createdAt: Date.now() });
+
+    // Update user profile atomically
+    const userRef = db.collection("users").doc(uid);
+    tx.set(
+      userRef,
+      {
+        displayName: firstName || username,
+        profile: {
+          username,
+          firstName: firstName ?? null,
+        },
+      },
+      { merge: true } as any,
+    );
+  });
+
+  return { ok: true };
 });

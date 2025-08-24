@@ -15,7 +15,8 @@ interface ButtonProps {
     | "white"
     | "secondary"
     | "danger"
-    | "dangerOutline";
+    | "dangerOutline"
+    | "glass"; // NEW
   size?: "icon" | "default";
   iconL?: React.ReactNode;
   iconR?: React.ReactNode;
@@ -71,6 +72,7 @@ export const Button = ({
     secondary: [colors.content3, colors.content4],
     danger: [colors.danger, colors.dangerDark],
     dangerOutline: ["#ffffff00", "#ffffff20"],
+    glass: ["#ffffff18", "#ffffff2B"], // NEW: translucent white glass
   }[variant];
 
   // Interpolate the background color
@@ -87,6 +89,7 @@ export const Button = ({
     secondary: "white",
     danger: "white",
     dangerOutline: colors.danger,
+    glass: "white", // NEW
   }[variant];
 
   // Applying the interpolated backgroundColor
@@ -108,6 +111,7 @@ export const Button = ({
             "border-2 border-border":
               variant === "outline" || variant === "dangerOutline",
             "border-danger": variant === "dangerOutline",
+            "border-2 border-white/30": variant === "glass", // NEW: glass outline
             "w-10 h-10 px-0 py-0": size === "icon",
             "w-full": size === "default",
           },
@@ -130,9 +134,6 @@ export const Button = ({
             <Text
               className={cn(
                 "font-bold",
-                // variant === "white" ? "text-black" : undefined,
-                // variant === "accent" ? "text-accentForeground" : undefined,
-                // variant === "dangerOutline" ? "text-danger" : undefined,
                 flexText ? "flex-1" : undefined,
               )}
               style={{ color }}
