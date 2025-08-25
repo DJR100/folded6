@@ -2,9 +2,10 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import * as Notifications from "expo-notifications";
 import * as Application from "expo-application";
 import React, { useState } from "react";
-import { Platform, Switch, TouchableOpacity, Linking } from "react-native";
+import { Platform, Switch, TouchableOpacity, Linking, Alert } from "react-native";
 
 import { Text, View } from "@/components/ui";
 import { useAuthContext } from "@/hooks/use-auth-context";
@@ -19,9 +20,17 @@ const ChevronRight = () => (
   <AntDesign name="right" size={16} color="white" style={{ opacity: 0.5 }} />
 );
 
+async function scheduleDailyReminder(hour = 21, minute = 0) {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  await Notifications.scheduleNotificationAsync({
+    content: { title: "Daily check-in", body: "Stay on track today." },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.CALENDAR, hour, minute, repeats: true },
+  });
+}
+
 export default function SettingsRoot() {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
-  const { user } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
 
   return (
     <View className="flex-1 bg-background">
@@ -37,7 +46,7 @@ export default function SettingsRoot() {
       <View className="px-4">
         <Text className="opacity-70 mb-2">FEEDBACK</Text>
 
-        <TouchableOpacity className="bg-white/5 rounded-xl px-4 py-4 mb-3">
+        <TouchableOpacity className="bg-white/5 rounded-xl px-4 py-4 mb-3" onPress={() => Alert.alert("Coming to the app store soon.")}>
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
               <Feather name="star" size={16} color="white" />
@@ -103,7 +112,35 @@ export default function SettingsRoot() {
           </View>
           <Switch
             value={remindersEnabled}
-            onValueChange={setRemindersEnabled}
+            onValueChange={async (v) => {
+              if (v) {
+                try {
+                  const current = await Notifications.getPermissionsAsync();
+                  let status = current.status;
+                  if (status !== "granted") {
+                    const asked = await Notifications.requestPermissionsAsync();
+                    status = asked.status;
+                  }
+                  if (status !== "granted") {
+                    Alert.alert(
+                      "Notifications disabled",
+                      "Enable notifications in iOS Settings to receive reminders.",
+                    );
+                    return;
+                  }
+                  await scheduleDailyReminder();
+                } catch {}
+              } else {
+                try {
+                  await Notifications.cancelAllScheduledNotificationsAsync();
+                } catch {}
+              }
+
+              setRemindersEnabled(v);
+              try {
+                await updateUser("notifications.remindersEnabled", v);
+              } catch {}
+            }}
           />
         </View>
 

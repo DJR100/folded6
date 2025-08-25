@@ -70,7 +70,8 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
