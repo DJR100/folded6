@@ -1,11 +1,16 @@
-import { User } from "@folded/types";
+import { DailyChallengeData, User } from "@folded/types";
 import {
   createUserWithEmailAndPassword,
   initializeAuth,
   signInWithEmailAndPassword,
   signOut as signOutFirebase,
 } from "@react-native-firebase/auth";
-import { doc, getDoc, onSnapshot, setDoc } from "@react-native-firebase/firestore";
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+} from "@react-native-firebase/firestore";
 import _ from "lodash";
 import {
   type PropsWithChildren,
@@ -16,7 +21,6 @@ import {
 } from "react";
 
 import { app, db } from "@/lib/firebase";
-import { DailyChallengeData } from "@folded/types";
 
 export const auth = initializeAuth(app);
 
@@ -45,7 +49,9 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 
   // Local state variables - these will be synced with database state
   const [onboarding, setOnboarding] = useState<number | "DONE">(0);
-  const [postOnboarding, setPostOnboarding] = useState<0 | 1 | 2 | 3 | "DONE">(0);
+  const [postOnboarding, setPostOnboarding] = useState<0 | 1 | 2 | 3 | "DONE">(
+    0,
+  );
   // COMMENTED OUT FOR V1 - Bank connection not required
   // const [bankConnected, setBankConnected] = useState<boolean>(false);
 
@@ -119,28 +125,30 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
           lastCompletedDate: null,
           lastAppOpenDate: null, // NEW field
           currentWeek: [false, false, false, false, false, false, false],
-          currentDayState: "pending"
+          currentDayState: "pending",
         };
         // Persist default daily challenge data
         await setDoc(
           doc(db, "users", auth.currentUser.uid),
           { dailyChallenge: defaultDailyChallengeData },
-          { merge: true }
+          { merge: true },
         );
         console.log("✅ Initialized dailyChallenge for new user");
-      } else if (!('lastAppOpenDate' in user.dailyChallenge)) {
+      } else if (!("lastAppOpenDate" in user.dailyChallenge)) {
         // Existing user - add missing field
         const updatedData = {
           ...user.dailyChallenge,
-          lastAppOpenDate: null // Initialize for existing users
+          lastAppOpenDate: null, // Initialize for existing users
         };
         // Persist addition of lastAppOpenDate for existing users
         await setDoc(
           doc(db, "users", auth.currentUser.uid),
           { dailyChallenge: updatedData },
-          { merge: true }
+          { merge: true },
         );
-        console.log("🔧 Added lastAppOpenDate to existing user's dailyChallenge");
+        console.log(
+          "🔧 Added lastAppOpenDate to existing user's dailyChallenge",
+        );
       }
     };
 
@@ -174,12 +182,14 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
       (doc) => {
         const updatedUser = doc.data() as User | undefined;
         if (!updatedUser) return;
-        
+
         console.log("📡 Real-time user update received");
-        console.log(`🔍 Firebase streak.start: ${updatedUser.streak?.start} (${updatedUser.streak?.start ? new Date(updatedUser.streak.start).toISOString() : 'undefined'})`);
-        
+        console.log(
+          `🔍 Firebase streak.start: ${updatedUser.streak?.start} (${updatedUser.streak?.start ? new Date(updatedUser.streak.start).toISOString() : "undefined"})`,
+        );
+
         setUser(updatedUser);
-        
+
         // Update local state when database changes in real-time
         if (updatedUser.tier === 0) {
           setOnboarding(0);
@@ -190,7 +200,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
         }
       },
     );
-    
+
     return () => {
       snapshotListener();
     };
@@ -200,11 +210,11 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
     if (!user) return;
 
     const keys = dotkey.split(".");
-    
+
     // 🎯 CRITICAL FIX: Build update object for merge instead of overwriting entire document
     const updateObject: any = {};
     let current = updateObject;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       current[keys[i]] = {};
       current = current[keys[i]];
@@ -218,7 +228,7 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
     await setDoc(doc(db, "users", user.uid), updateObject, { merge: true });
 
     console.log(`✅ Firebase merge completed for ${dotkey}`);
-    
+
     // Don't update local state - let the real-time listener handle it
     // This prevents race conditions and ensures we always have the latest data
   };

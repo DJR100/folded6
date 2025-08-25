@@ -3,10 +3,10 @@ import { useMemo } from "react";
 import { StatusBar, View as RNView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ProgressBar } from "@/components/daily-challenge/progress-bar";
+import { Text, View } from "@/components/ui";
 import { colors } from "@/constants/colors";
 import { DailyChallengeProvider } from "@/hooks/daily-challenge-context";
-import { ProgressBar } from "@/components/daily-challenge/progress-bar";
-import { View, Text } from "@/components/ui";
 
 export default function DailyChallengeLayout() {
   const segments = useSegments();
@@ -16,11 +16,11 @@ export default function DailyChallengeLayout() {
   // Determine progress based on current route
   const progress = useMemo(() => {
     switch (currentRoute) {
-      case 'intro':
+      case "intro":
         return 0;
-      case 'photo-capture':
+      case "photo-capture":
         return 50;
-      case 'congratulations':
+      case "congratulations":
         return 100;
       default:
         return 0;
@@ -32,12 +32,15 @@ export default function DailyChallengeLayout() {
       {/* Full screen background - same grey as rest of app */}
       <RNView style={{ flex: 1, backgroundColor: colors.background }}>
         {/* Status Bar */}
-        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
-        
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={colors.background}
+        />
+
         {/* Content area with no top padding - starts right after status bar */}
-        <View 
+        <View
           className="flex-1 bg-background"
-          style={{ 
+          style={{
             paddingBottom: insets.bottom, // Keep bottom safe area for home indicator
           }}
         >
@@ -60,19 +63,19 @@ export default function DailyChallengeLayout() {
               animation: "slide_from_bottom",
             }}
           >
-            <Stack.Screen 
-              name="intro" 
+            <Stack.Screen
+              name="intro"
               options={{
                 gestureEnabled: false,
               }}
             />
-            <Stack.Screen 
+            <Stack.Screen
               name="photo-capture"
               options={{
                 gestureEnabled: false,
               }}
             />
-            <Stack.Screen 
+            <Stack.Screen
               name="congratulations"
               options={{
                 gestureEnabled: false,
@@ -83,4 +86,4 @@ export default function DailyChallengeLayout() {
       </RNView>
     </DailyChallengeProvider>
   );
-} 
+}

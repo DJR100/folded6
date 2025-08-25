@@ -19,7 +19,7 @@ export interface UseDailyChallengeReturn {
   dailyChallenge: DailyChallengeData;
   isLoading: boolean;
   error: string | null;
-  
+
   // Computed values
   timeLeftInDay: {
     hours: number;
@@ -34,14 +34,14 @@ export interface UseDailyChallengeReturn {
     completed: boolean;
     isToday: boolean;
   }[];
-  
+
   // Actions
   startChallenge: () => void;
   completeChallenge: (photo?: PhotoResult) => Promise<void>;
   skipChallenge: () => Promise<void>;
   resetForNewDay: () => Promise<void>;
   trackAppOpen: () => Promise<void>;
-  
+
   // DEV: Development helpers (only available in dev mode)
   resetDailyChallengeForDev?: () => Promise<void>;
 }
@@ -111,4 +111,4 @@ export interface DailyChallengeScreenParams {
   capture: {
     streakCount: number;
   };
-} 
+}

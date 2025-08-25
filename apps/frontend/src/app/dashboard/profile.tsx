@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
-import { useAuthContext } from "@/hooks/use-auth-context";
+import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
 
+import { FeedbackModal } from "@/components/feedbackModal";
 import { DashboardLayout } from "@/components/layouts/dashboard";
 import { ProfileEditModal } from "@/components/profile-edit-modal";
 import { Text, View } from "@/components/ui";
-import { FeedbackModal } from "@/components/feedbackModal";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function Index() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -17,8 +17,7 @@ export default function Index() {
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
 
-  const displayName =
-    user?.displayName || user?.email?.split("@")[0] || "User";
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   return (
     <DashboardLayout>
@@ -26,15 +25,15 @@ export default function Index() {
         {/* Top Row - Title & Settings */}
         <View className="flex-row items-center justify-between mb-4">
           <View className="w-6" />
-          
+
           {/* Centered Title */}
           <Text className="text-lg font-medium">Folded</Text>
-          
+
           {/* Settings Gear - Right aligned with margin */}
           <View style={{ marginRight: 6 }}>
-            <AntDesign 
-              name="setting" 
-              size={24} 
+            <AntDesign
+              name="setting"
+              size={24}
               color="white"
               style={{ opacity: 0.4 }}
             />
@@ -46,7 +45,7 @@ export default function Index() {
           {/* Circular Profile Picture */}
           <View
             className="w-[120px] h-[120px] rounded-full border-2 border-gray-400 mb-4 items-center justify-center overflow-hidden"
-            style={{ borderColor: '#9CA3AF', backgroundColor: 'transparent' }}
+            style={{ borderColor: "#9CA3AF", backgroundColor: "transparent" }}
           >
             {user?.photoURL ? (
               <Image
@@ -58,14 +57,14 @@ export default function Index() {
               <Text className="text-4xl">👤</Text>
             )}
           </View>
-          
+
           {/* Username with Edit Icon */}
           <View className="flex-row items-baseline">
             <Text className="text-lg font-semibold">{displayName}</Text>
             <TouchableOpacity onPress={openModal} style={{ marginLeft: 4 }}>
-              <AntDesign 
-                name="edit" 
-                size={16} 
+              <AntDesign
+                name="edit"
+                size={16}
                 color="white"
                 style={{ opacity: 0.4 }}
               />
@@ -107,10 +106,7 @@ export default function Index() {
         </View>
       </View>
 
-      <ProfileEditModal
-        visible={isModalVisible}
-        onClose={closeModal}
-      />
+      <ProfileEditModal visible={isModalVisible} onClose={closeModal} />
       <FeedbackModal
         visible={feedbackVisible}
         onClose={() => setFeedbackVisible(false)}

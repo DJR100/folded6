@@ -2,8 +2,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 import { colors } from "@/constants/colors";
-import { useAuthContext } from "@/hooks/use-auth-context";
 import { DailyChallengeProvider } from "@/hooks/daily-challenge-context";
+import { useAuthContext } from "@/hooks/use-auth-context";
 import { useNotifications } from "@/lib/notifications";
 
 export default function DashboardLayout() {
@@ -41,7 +41,7 @@ export default function DashboardLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile", 
+            title: "Profile",
             tabBarIcon: ({ focused }) => (
               <FontAwesome
                 name="user"

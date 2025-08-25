@@ -1,12 +1,24 @@
 // apps/frontend/src/components/feedback-modal.tsx
-import React, { useMemo, useState } from "react";
-import { Modal, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Button, Input, Text, View } from "@/components/ui";
-import { db } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "@react-native-firebase/firestore";
-import { useAuthContext } from "@/hooks/use-auth-context";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+} from "@react-native-firebase/firestore";
+import React, { useMemo, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Button, Input, Text, View } from "@/components/ui";
+import { useAuthContext } from "@/hooks/use-auth-context";
+import { db } from "@/lib/firebase";
 
 type Mode = "menu" | "bug" | "general" | "feature";
 
@@ -22,11 +34,15 @@ export function FeedbackModal({
 
   // General feedback rotating placeholder
   const generalPHs = useMemo(
-    () => ["Something confusing?", "Anything feel slow or clunky?", "Love something?"],
-    []
+    () => [
+      "Something confusing?",
+      "Anything feel slow or clunky?",
+      "Love something?",
+    ],
+    [],
   );
   const [generalPHIndex, setGeneralPHIndex] = useState(() =>
-    Math.floor(Math.random() * generalPHs.length)
+    Math.floor(Math.random() * generalPHs.length),
   );
   const generalPH = generalPHs[generalPHIndex];
 
@@ -41,13 +57,15 @@ export function FeedbackModal({
   // Feature fields
   const [featureIdea, setFeatureIdea] = useState("");
   const [featureDesc, setFeatureDesc] = useState("");
-  const [featureImpact, setFeatureImpact] = useState<"nice" | "helpful" | "must" | null>(null);
+  const [featureImpact, setFeatureImpact] = useState<
+    "nice" | "helpful" | "must" | null
+  >(null);
 
   const { user } = useAuthContext();
 
   const submitFeedback = async (
     type: "bug" | "general" | "feature",
-    payload: Record<string, any>
+    payload: Record<string, any>,
   ) => {
     if (!user?.uid) throw new Error("Must be signed in to submit feedback");
     await addDoc(collection(db, "feedback"), {
@@ -72,7 +90,12 @@ export function FeedbackModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={resetAndClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={resetAndClose}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -88,7 +111,13 @@ export function FeedbackModal({
             >
               <View className="flex-row items-center justify-between mb-3">
                 <Text variant="h3">
-                  {mode === "menu" ? "Send Feedback" : mode === "bug" ? "Report a Bug" : mode === "general" ? "General Feedback" : "Feature Idea"}
+                  {mode === "menu"
+                    ? "Send Feedback"
+                    : mode === "bug"
+                      ? "Report a Bug"
+                      : mode === "general"
+                        ? "General Feedback"
+                        : "Feature Idea"}
                 </Text>
                 <TouchableOpacity onPress={resetAndClose}>
                   <AntDesign name="close" size={22} color="white" />
@@ -98,12 +127,22 @@ export function FeedbackModal({
               {mode === "menu" && (
                 <View className="flex gap-3">
                   <Button text="Report Bug" onPress={() => setMode("bug")} />
-                  <Button text="General Feedback" onPress={() => setMode("general")} />
-                  <Button text="Feature Idea" onPress={() => setMode("feature")} />
+                  <Button
+                    text="General Feedback"
+                    onPress={() => setMode("general")}
+                  />
+                  <Button
+                    text="Feature Idea"
+                    onPress={() => setMode("feature")}
+                  />
                   <Text className="text-xs opacity-60 text-center mt-1">
                     Includes device/app details. We may email you about this.
                   </Text>
-                  <Button variant="secondary" text="Close" onPress={resetAndClose} />
+                  <Button
+                    variant="secondary"
+                    text="Close"
+                    onPress={resetAndClose}
+                  />
                 </View>
               )}
 
@@ -130,7 +169,10 @@ export function FeedbackModal({
                   <Button
                     text="Send bug"
                     onPress={async () => {
-                      await submitFeedback("bug", { what: bugWhat, trying: bugTrying });
+                      await submitFeedback("bug", {
+                        what: bugWhat,
+                        trying: bugTrying,
+                      });
                       Alert.alert("Thanks!", "Bug report received ✅");
                       resetAndClose();
                     }}
@@ -138,7 +180,11 @@ export function FeedbackModal({
                   <Text className="text-xs opacity-60">
                     Includes device/app details. We may email you about this.
                   </Text>
-                  <Button variant="secondary" text="Back" onPress={() => setMode("menu")} />
+                  <Button
+                    variant="secondary"
+                    text="Back"
+                    onPress={() => setMode("menu")}
+                  />
                 </View>
               )}
 
@@ -169,7 +215,10 @@ export function FeedbackModal({
                   <Button
                     text="Send feedback"
                     onPress={async () => {
-                      await submitFeedback("general", { sentiment, text: generalText });
+                      await submitFeedback("general", {
+                        sentiment,
+                        text: generalText,
+                      });
                       Alert.alert("Appreciate it", "Logged! 🙌");
                       resetAndClose();
                       setGeneralPHIndex((i) => (i + 1) % generalPHs.length);
@@ -178,7 +227,11 @@ export function FeedbackModal({
                   <Text className="text-xs opacity-60">
                     Includes device/app details. We may email you about this.
                   </Text>
-                  <Button variant="secondary" text="Back" onPress={() => setMode("menu")} />
+                  <Button
+                    variant="secondary"
+                    text="Back"
+                    onPress={() => setMode("menu")}
+                  />
                 </View>
               )}
 
@@ -213,7 +266,11 @@ export function FeedbackModal({
                       <View key={chip.key} className="flex-1 max-w-[140px]">
                         <Button
                           text={chip.label}
-                          variant={featureImpact === (chip.key as any) ? "accent" : "secondary"}
+                          variant={
+                            featureImpact === (chip.key as any)
+                              ? "accent"
+                              : "secondary"
+                          }
                           onPress={() => setFeatureImpact(chip.key as any)}
                         />
                       </View>
@@ -235,7 +292,11 @@ export function FeedbackModal({
                   <Text className="text-xs opacity-60">
                     Includes device/app details. We may email you about this.
                   </Text>
-                  <Button variant="secondary" text="Back" onPress={() => setMode("menu")} />
+                  <Button
+                    variant="secondary"
+                    text="Back"
+                    onPress={() => setMode("menu")}
+                  />
                 </View>
               )}
             </ScrollView>

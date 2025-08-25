@@ -1,10 +1,9 @@
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 
 import { Button, Text, View } from "@/components/ui";
 import Face from "@/components/ui/face";
 import Hover from "@/components/ui/hover";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import { router } from "expo-router";
 
 export default function SignIn() {
   const { user } = useAuthContext();

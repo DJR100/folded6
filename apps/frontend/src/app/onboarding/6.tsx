@@ -44,7 +44,8 @@ export default function Onboarding() {
             yourself, with us cheering you on.
           </Text>
           <Text variant="p">
-          Imagine looking back in seven days and seeing real progress. Let’s make that happen together.
+            Imagine looking back in seven days and seeing real progress. Let’s
+            make that happen together.
           </Text>
 
           <View className="flex flex-col gap-4 mt-4">

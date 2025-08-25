@@ -50,8 +50,7 @@ export interface SpendMeta {
  */
 export function deriveSpendMeta(monthlyMax: number): SpendMeta {
   const monthlySpendAssumptionUSD = lookupMonthlySpend(monthlyMax);
-  const usdPerMs =
-    monthlySpendAssumptionUSD / (DAYS_PER_MONTH * MS_PER_DAY);
+  const usdPerMs = monthlySpendAssumptionUSD / (DAYS_PER_MONTH * MS_PER_DAY);
   return { monthlySpendAssumptionUSD, usdPerMs };
 }
 
@@ -65,7 +64,7 @@ export function deriveSpendMeta(monthlyMax: number): SpendMeta {
  */
 export function computeSaved(
   usdPerMs: number,
-  quitTimestampMs: number
+  quitTimestampMs: number,
 ): number {
   const elapsedMs = Date.now() - quitTimestampMs;
   return elapsedMs * usdPerMs;

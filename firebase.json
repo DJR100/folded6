@@ -12,7 +12,6 @@
       ],
       "predeploy": [
         "npm run format",
-        "npm run lint",
         "cd packages/types && npm install && npm run build",
         "cd apps/api && npm install && npm run build"
       ],

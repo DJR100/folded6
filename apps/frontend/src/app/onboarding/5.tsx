@@ -9,22 +9,22 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function Onboarding() {
   const { setOnboarding } = useAuthContext();
-  
+
   // Skip guardian selection step - immediately move to step 6
   useEffect(() => {
     const skipToNextStep = () => {
       setOnboarding(6);
       router.push("/onboarding/6");
     };
-    
+
     skipToNextStep();
   }, [setOnboarding]);
-  
+
   return null; // Return null since we're immediately redirecting
 
   // COMMENTED OUT GUARDIAN SELECTION FUNCTIONALITY - keeping for future use
   // const [selectedGuardian, setSelectedGuardian] = useState<string>("guardian-0");
-  // 
+  //
   // const onComplete = async () => {
   //   updateUser("guardian.guardianId", selectedGuardian);
   //   setOnboarding(6);

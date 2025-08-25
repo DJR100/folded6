@@ -132,10 +132,7 @@ export const Button = ({
           {iconL}
           {text && (
             <Text
-              className={cn(
-                "font-bold",
-                flexText ? "flex-1" : undefined,
-              )}
+              className={cn("font-bold", flexText ? "flex-1" : undefined)}
               style={{ color }}
             >
               {text}

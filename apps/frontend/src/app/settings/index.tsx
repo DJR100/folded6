@@ -1,15 +1,18 @@
-import React, { useState } from "react";
-import { TouchableOpacity, Switch } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import React, { useState } from "react";
+import { Switch, TouchableOpacity } from "react-native";
+
 import { Text, View } from "@/components/ui";
 
 const FEEDBACK_URL = "https://forms.gle/7nmUPk3wC15mmL4p8";
 
 // helper chevron
-const ChevronRight = () => <AntDesign name="right" size={16} color="white" style={{ opacity: 0.5 }} />;
+const ChevronRight = () => (
+  <AntDesign name="right" size={16} color="white" style={{ opacity: 0.5 }} />
+);
 
 export default function SettingsRoot() {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
@@ -20,7 +23,9 @@ export default function SettingsRoot() {
         <TouchableOpacity onPress={() => router.back()}>
           <AntDesign name="left" size={22} color="white" />
         </TouchableOpacity>
-        <Text variant="h3" className="ml-2">Settings</Text>
+        <Text variant="h3" className="ml-2">
+          Settings
+        </Text>
       </View>
 
       <View className="px-4">
@@ -77,7 +82,10 @@ export default function SettingsRoot() {
             <Feather name="bell" size={16} color="white" />
             <Text className="text-white">Notifications</Text>
           </View>
-          <Switch value={remindersEnabled} onValueChange={setRemindersEnabled} />
+          <Switch
+            value={remindersEnabled}
+            onValueChange={setRemindersEnabled}
+          />
         </View>
 
         <TouchableOpacity

@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal } from "react-native";
+
 import { Button, Text, View } from "@/components/ui";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { api } from "@/lib/firebase";
@@ -22,7 +23,9 @@ export function SettingsModal({
     >
       <View className="flex-1 bg-black/50 justify-end">
         <View className="bg-background px-4 pt-4 pb-6 rounded-t-2xl">
-          <Text variant="h3" className="text-center mb-4">Settings</Text>
+          <Text variant="h3" className="text-center mb-4">
+            Settings
+          </Text>
 
           <View className="flex gap-3">
             {/*

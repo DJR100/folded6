@@ -24,66 +24,74 @@ export default function RecoveryProgress() {
 
   const onContinue = async () => {
     const days = parseInt(recoveryDays) || 0;
-    
-    console.log(`🚀 Starting recovery counter initialization with ${days} days`);
-    
+
+    console.log(
+      `🚀 Starting recovery counter initialization with ${days} days`,
+    );
+
     // Always initialize counters, even if days is 0
-    const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(days);
-    
-    console.log('📝 About to update Firebase with:', {
-      'streak.start': streakStart,
-      'streak.start_readable': new Date(streakStart).toISOString(),
-      'dailyChallenge.streakCount': dailyChallenge.streakCount,
-      'existingRecoveryDays': existingRecoveryDays
+    const { streakStart, dailyChallenge, existingRecoveryDays } =
+      initializeRecoveryCounters(days);
+
+    console.log("📝 About to update Firebase with:", {
+      "streak.start": streakStart,
+      "streak.start_readable": new Date(streakStart).toISOString(),
+      "dailyChallenge.streakCount": dailyChallenge.streakCount,
+      existingRecoveryDays: existingRecoveryDays,
     });
-    
+
     // 🎯 CRITICAL FIX: Update sequentially to avoid race conditions
-    console.log('🔧 Step 1: Setting streak.start...');
+    console.log("🔧 Step 1: Setting streak.start...");
     await updateUser("streak.start", streakStart);
-    
-    console.log('🔧 Step 2: Setting dailyChallenge...');
+
+    console.log("🔧 Step 2: Setting dailyChallenge...");
     await updateUser("dailyChallenge", dailyChallenge);
-    
-    console.log('🔧 Step 3: Setting existingRecoveryDays...');
+
+    console.log("🔧 Step 3: Setting existingRecoveryDays...");
     await updateUser("demographic.existingRecoveryDays", existingRecoveryDays);
-    
-    console.log(`✅ Initialized all recovery counters with ${days} days of existing progress`);
-    console.log(`🎯 Expected streak start: ${new Date(streakStart).toISOString()}`);
-    
+
+    console.log(
+      `✅ Initialized all recovery counters with ${days} days of existing progress`,
+    );
+    console.log(
+      `🎯 Expected streak start: ${new Date(streakStart).toISOString()}`,
+    );
+
     // Small delay to ensure Firestore sync
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     setOnboarding(4);
     router.push("/onboarding/4");
   };
 
   const onJustStarting = async () => {
-    console.log('🚀 Starting fresh recovery (0 days)');
-    
+    console.log("🚀 Starting fresh recovery (0 days)");
+
     // Use the same initialization logic with 0 days
-    const { streakStart, dailyChallenge, existingRecoveryDays } = initializeRecoveryCounters(0);
-    
-    console.log('📝 About to update Firebase with fresh start:', {
-      'streak.start': streakStart,
-      'streak.start_readable': new Date(streakStart).toISOString(),
-      'dailyChallenge.streakCount': dailyChallenge.streakCount
+    const { streakStart, dailyChallenge, existingRecoveryDays } =
+      initializeRecoveryCounters(0);
+
+    console.log("📝 About to update Firebase with fresh start:", {
+      "streak.start": streakStart,
+      "streak.start_readable": new Date(streakStart).toISOString(),
+      "dailyChallenge.streakCount": dailyChallenge.streakCount,
     });
-    
+
     // 🎯 CRITICAL FIX: Update sequentially to avoid race conditions
-    console.log('🔧 Step 1: Setting streak.start...');
+    console.log("🔧 Step 1: Setting streak.start...");
     await updateUser("streak.start", streakStart);
-    
-    console.log('🔧 Step 2: Setting dailyChallenge...');
+
+    console.log("🔧 Step 2: Setting dailyChallenge...");
     await updateUser("dailyChallenge", dailyChallenge);
-    
-    console.log('🔧 Step 3: Setting existingRecoveryDays...');
+
+    console.log("🔧 Step 3: Setting existingRecoveryDays...");
     await updateUser("demographic.existingRecoveryDays", 0);
-    
+
     console.log("✅ Initialized all recovery counters for fresh start");
-    
+
     // Small delay to ensure Firestore sync
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     setOnboarding(4);
     router.push("/onboarding/4");
   };
@@ -108,16 +116,20 @@ export default function RecoveryProgress() {
         }}
       >
         <Text variant="p" className="text-center mb-6">
-          If you've already started your recovery journey, let us know how many days you've been gambling-free. We want to celebrate every step of your progress!
+          If you've already started your recovery journey, let us know how many
+          days you've been gambling-free. We want to celebrate every step of
+          your progress!
         </Text>
 
         {showCelebration && (
           <View className="bg-accent/20 p-4 rounded-xl mb-4 border border-accent/30">
             <Text className="text-center font-bold text-accent">
-              🎉 Amazing! {recoveryDays} day{parseInt(recoveryDays) !== 1 ? 's' : ''} of progress
+              🎉 Amazing! {recoveryDays} day
+              {parseInt(recoveryDays) !== 1 ? "s" : ""} of progress
             </Text>
             <Text className="text-center text-sm text-accent/80 mt-1">
-              All your counters will show this progress when you complete onboarding
+              All your counters will show this progress when you complete
+              onboarding
             </Text>
           </View>
         )}
@@ -132,21 +144,22 @@ export default function RecoveryProgress() {
             onSubmitEditing={handleKeyboardSubmit}
             blurOnSubmit={true}
           />
-          
+
           <Text variant="sm" muted className="text-center">
-            Don't worry if you're just starting - every journey begins with day 1
+            Don't worry if you're just starting - every journey begins with day
+            1
           </Text>
         </View>
 
         <View className="flex flex-col gap-3">
-          <Button 
-            text="Continue" 
+          <Button
+            text="Continue"
             onPress={onContinue}
             disabled={recoveryDays === ""}
           />
-          
-          <Button 
-            text="I'm just starting" 
+
+          <Button
+            text="I'm just starting"
             variant="secondary"
             onPress={onJustStarting}
           />
@@ -154,4 +167,4 @@ export default function RecoveryProgress() {
       </OnboardingLayout>
     </TouchableWithoutFeedback>
   );
-} 
+}

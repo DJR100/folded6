@@ -1,9 +1,13 @@
-import { Platform } from "react-native";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+} from "@react-native-firebase/firestore";
 import Constants from "expo-constants";
-import { addDoc, collection, serverTimestamp } from "@react-native-firebase/firestore";
+import { Platform } from "react-native";
 
-import { db } from "@/lib/firebase";
 import { auth } from "@/hooks/use-auth-context";
+import { db } from "@/lib/firebase";
 
 type EventParams = Record<string, any> | undefined;
 
@@ -22,5 +26,3 @@ export async function logEvent(name: string, params?: EventParams) {
     console.warn("logEvent failed:", error);
   }
 }
-
-

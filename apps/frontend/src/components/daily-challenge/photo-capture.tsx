@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { TouchableOpacity, Alert } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
 import { PhotoCaptureProps, PhotoResult } from "@folded/types";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import { Alert, TouchableOpacity } from "react-native";
+
 import { Text, View } from "@/components/ui";
 
-export function PhotoCapture({ 
-  onPhotoTaken, 
-  onSkip, 
-  isLoading = false 
+export function PhotoCapture({
+  onPhotoTaken,
+  onSkip,
+  isLoading = false,
 }: PhotoCaptureProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -17,11 +17,11 @@ export function PhotoCapture({
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-    
-    if (status !== 'granted' || cameraStatus.status !== 'granted') {
+
+    if (status !== "granted" || cameraStatus.status !== "granted") {
       Alert.alert(
-        'Permissions needed',
-        'Please grant camera and photo library permissions to complete the daily challenge.'
+        "Permissions needed",
+        "Please grant camera and photo library permissions to complete the daily challenge.",
       );
       return false;
     }
@@ -35,7 +35,7 @@ export function PhotoCapture({
     try {
       setIsProcessing(true);
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         allowsEditing: false, // No editing needed for daily challenge
         quality: 0.8,
       });
@@ -43,13 +43,13 @@ export function PhotoCapture({
       if (!result.canceled && result.assets[0]) {
         const photo: PhotoResult = {
           uri: result.assets[0].uri,
-          type: 'camera'
+          type: "camera",
         };
         onPhotoTaken(photo);
       }
     } catch (error) {
-      console.error('Error taking photo:', error);
-      Alert.alert('Error', 'Failed to take photo');
+      console.error("Error taking photo:", error);
+      Alert.alert("Error", "Failed to take photo");
     } finally {
       setIsProcessing(false);
     }
@@ -62,7 +62,7 @@ export function PhotoCapture({
     try {
       setIsProcessing(true);
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         allowsEditing: false, // No editing needed for daily challenge
         quality: 0.8,
       });
@@ -70,13 +70,13 @@ export function PhotoCapture({
       if (!result.canceled && result.assets[0]) {
         const photo: PhotoResult = {
           uri: result.assets[0].uri,
-          type: 'gallery'
+          type: "gallery",
         };
         onPhotoTaken(photo);
       }
     } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to pick image');
+      console.error("Error picking image:", error);
+      Alert.alert("Error", "Failed to pick image");
     } finally {
       setIsProcessing(false);
     }
@@ -89,14 +89,14 @@ export function PhotoCapture({
       [
         {
           text: "Cancel",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Skip",
           style: "destructive",
-          onPress: onSkip
-        }
-      ]
+          onPress: onSkip,
+        },
+      ],
     );
   };
 
@@ -106,10 +106,10 @@ export function PhotoCapture({
     <View className="flex-1 bg-background">
       {/* Main Content Card - Exact same structure as intro */}
       <View className="flex-1 px-4">
-        <View 
+        <View
           className="rounded-3xl p-8 justify-center"
           style={{
-            backgroundColor: '#8B5CF6', // Changed from teal to purple
+            backgroundColor: "#8B5CF6", // Changed from teal to purple
             minHeight: 500,
             flex: 1,
           }}
@@ -120,23 +120,23 @@ export function PhotoCapture({
               Daily Challenge
             </Text>
 
-            <Text 
+            <Text
               className="text-white text-2xl font-bold text-center leading-tight mb-8"
               style={{ lineHeight: 32 }}
             >
-              Snap a photo of what{'\n'}you're doing right{'\n'}now.
+              Snap a photo of what{"\n"}you're doing right{"\n"}now.
             </Text>
           </View>
 
           {/* Centrally aligned action section - EXACT same structure as intro */}
           <View className="items-center">
             {/* Skip Option */}
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleSkipPress}
               disabled={isButtonDisabled}
               className="mb-8"
             >
-              <Text 
+              <Text
                 className="text-white text-base font-medium"
                 style={{ opacity: isButtonDisabled ? 0.5 : 0.6 }}
               >
@@ -145,14 +145,17 @@ export function PhotoCapture({
             </TouchableOpacity>
 
             {/* Photo Action Buttons - Black icons with white backgrounds */}
-            <View className="flex-row justify-center items-center" style={{ gap: 40 }}>
+            <View
+              className="flex-row justify-center items-center"
+              style={{ gap: 40 }}
+            >
               {/* Gallery Button */}
               <TouchableOpacity
                 onPress={handleGalleryPress}
                 disabled={isButtonDisabled}
                 className="w-20 h-20 rounded-full items-center justify-center"
                 style={{
-                  backgroundColor: '#FFFFFF', // White background
+                  backgroundColor: "#FFFFFF", // White background
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
@@ -165,7 +168,7 @@ export function PhotoCapture({
                 disabled={isButtonDisabled}
                 className="w-20 h-20 rounded-full items-center justify-center"
                 style={{
-                  backgroundColor: '#FFFFFF', // White background
+                  backgroundColor: "#FFFFFF", // White background
                   opacity: isButtonDisabled ? 0.5 : 1,
                 }}
               >
@@ -181,13 +184,13 @@ export function PhotoCapture({
 
       {/* Loading overlay */}
       {isProcessing && (
-        <View 
+        <View
           className="absolute inset-0 bg-black items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
         >
           <Text className="text-white text-lg">Processing photo...</Text>
         </View>
       )}
     </View>
   );
-} 
+}

@@ -1,12 +1,13 @@
-import React from "react";
-import { Alert, TouchableOpacity, Share } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import * as WebBrowser from "expo-web-browser";
+import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import React from "react";
+import { Alert, Share, TouchableOpacity } from "react-native";
+
 import { Text, View } from "@/components/ui";
 import { useAuthContext } from "@/hooks/use-auth-context";
-import * as Clipboard from "expo-clipboard";
 
 const ChevronRight = () => (
   <AntDesign name="right" size={16} color="white" style={{ opacity: 0.5 }} />
@@ -25,7 +26,9 @@ export default function AccountSettings() {
         <TouchableOpacity onPress={() => router.back()}>
           <AntDesign name="left" size={22} color="white" />
         </TouchableOpacity>
-        <Text variant="h3" className="ml-2">Account</Text>
+        <Text variant="h3" className="ml-2">
+          Account
+        </Text>
       </View>
 
       <View className="px-4">
@@ -62,7 +65,9 @@ export default function AccountSettings() {
         <View className="bg-white/5 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             <Feather name="user" size={16} color="white" />
-            <Text className="text-white" selectable>{user?.email ?? "—"}</Text>
+            <Text className="text-white" selectable>
+              {user?.email ?? "—"}
+            </Text>
           </View>
           <TouchableOpacity
             onPress={async () => {
@@ -72,7 +77,12 @@ export default function AccountSettings() {
               }
             }}
           >
-            <Feather name="copy" size={16} color="white" style={{ opacity: 0.8 }} />
+            <Feather
+              name="copy"
+              size={16}
+              color="white"
+              style={{ opacity: 0.8 }}
+            />
           </TouchableOpacity>
         </View>
 
@@ -111,8 +121,27 @@ export default function AccountSettings() {
               "This is permanent and cannot be undone.",
               [
                 { text: "Cancel", style: "cancel" },
-                { text: "Continue", style: "destructive", onPress: () => console.log("TODO: delete account flow") },
-              ]
+                {
+                  text: "Continue",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      const { api } = await import("@/lib/firebase");
+                      const res = await api({ endpoint: "user-deleteAccount" });
+                      console.log("deleteAccount result:", res);
+                      await signOut();
+                      router.replace("/");
+                    } catch (e) {
+                      console.log("deleteAccount error:", e);
+                      Alert.alert(
+                        "Error",
+                        (e as any)?.message ??
+                          "We couldn't delete your account. Please try again.",
+                      );
+                    }
+                  },
+                },
+              ],
             )
           }
         >
@@ -128,5 +157,3 @@ export default function AccountSettings() {
     </View>
   );
 }
-
-

@@ -1,12 +1,12 @@
 import { Range } from "@folded/types";
+import { doc, setDoc } from "@react-native-firebase/firestore";
 import React, { useState } from "react";
 
-import { deriveSpendMeta } from "@/lib/moneysaved";
 import { OnboardingLayout } from "@/components/layouts/onboarding";
 import { Button, Input, Text } from "@/components/ui";
-import { doc, setDoc } from "@react-native-firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useAuthContext } from "@/hooks/use-auth-context";
+import { db } from "@/lib/firebase";
+import { deriveSpendMeta } from "@/lib/moneysaved";
 
 export interface OnboardingFormStage {
   title: string;
@@ -48,24 +48,23 @@ export default function OnboardingForm({
   const onPress = async (value: string | Range) => {
     if (stages[stage].key) {
       await updateUser(stages[stage].key, value);
-  
+
       // Check if this is the monthly spend question
       if (stages[stage].key === "demographic.gambling.monthlySpend") {
         // Get the max value (if value is a Range, use value.max; if number, use value)
         const max =
           typeof value === "object" && "max" in value ? value.max : value;
-  
+
         // 1. Calculate spendMeta
         const spendMeta = deriveSpendMeta(Number(max));
-  
-        // 2. Save spendMeta to Firestore
 
+        // 2. Save spendMeta to Firestore
 
         if (user?.uid) {
           await setDoc(
             doc(db, "users", user.uid),
             { spendMeta },
-            { merge: true }
+            { merge: true },
           );
         }
       }

@@ -17,17 +17,17 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function Connect() {
   const { setOnboarding } = useAuthContext(); // setBankConnected removed since not needed
-  
+
   // Skip bank connection step - immediately move to post-onboarding
   useEffect(() => {
     const skipToNextStep = () => {
       setOnboarding("DONE");
       router.push("/post-onboarding");
     };
-    
+
     skipToNextStep();
   }, [setOnboarding]);
-  
+
   return null; // Return null since we're immediately redirecting
 
   // COMMENTED OUT PLAID BANK CONNECTION FUNCTIONALITY - keeping for future use

@@ -19,16 +19,16 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 //     aspect: [4, 3],
 //     quality: 1,
 //   });
-// 
+//
 //   console.log(result);
-// 
+//
 //   if (result.canceled) return;
-// 
+//
 //   // TODO: Upload image to firebase storage
-// 
+//
 //   return result.assets[0].uri;
 // };
-// 
+//
 // const RecoveryBadge = ({
 //   recovery,
 //   opacity,
@@ -45,7 +45,7 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 //     </Text>
 //   </View>
 // );
-// 
+//
 // const stages: OnboardingFormStage[] = [
 //   {
 //     title: "First, we need you to upload an important picture.",
@@ -84,19 +84,19 @@ import { useAuthContext } from "@/hooks/use-auth-context";
 
 export default function Onboarding() {
   const { setOnboarding } = useAuthContext();
-  
+
   // Skip image selection step - immediately move to step 4
   useEffect(() => {
     const skipToNextStep = () => {
       setOnboarding(4);
       router.push("/onboarding/4");
     };
-    
+
     skipToNextStep();
   }, [setOnboarding]);
-  
+
   return null; // Return null since we're immediately redirecting
-  
+
   // COMMENTED OUT - keeping for future use
   // return <OnboardingForm stages={stages} onComplete={onComplete} />;
 }

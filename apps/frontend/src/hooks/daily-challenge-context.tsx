@@ -1,10 +1,16 @@
-import React, { createContext, useContext, type PropsWithChildren } from "react";
-
 import { DailyChallengeContextValue } from "@folded/types";
+import React, {
+  type PropsWithChildren,
+  createContext,
+  useContext,
+} from "react";
+
 import { useDailyChallenge } from "./use-daily-challenge";
 
 // Create the context
-const DailyChallengeContext = createContext<DailyChallengeContextValue | null>(null);
+const DailyChallengeContext = createContext<DailyChallengeContextValue | null>(
+  null,
+);
 
 // Provider component
 export function DailyChallengeProvider({ children }: PropsWithChildren) {
@@ -20,15 +26,15 @@ export function DailyChallengeProvider({ children }: PropsWithChildren) {
 // Custom hook to consume the context
 export function useDailyChallengeContext(): DailyChallengeContextValue {
   const context = useContext(DailyChallengeContext);
-  
+
   if (!context) {
     throw new Error(
-      "useDailyChallengeContext must be used within a DailyChallengeProvider"
+      "useDailyChallengeContext must be used within a DailyChallengeProvider",
     );
   }
-  
+
   return context;
 }
 
 // Export context for advanced use cases (optional)
-export { DailyChallengeContext }; 
+export { DailyChallengeContext };

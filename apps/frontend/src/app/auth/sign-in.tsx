@@ -15,7 +15,9 @@ export default function SignInScreen() {
   return (
     <View className="flex-1 px-4 py-6 gap-8">
       <View className="gap-2">
-        <Text variant="h1" className="text-center">Welcome back</Text>
+        <Text variant="h1" className="text-center">
+          Welcome back
+        </Text>
         <Text variant="p" className="text-center" muted>
           Sign in to continue your recovery.
         </Text>

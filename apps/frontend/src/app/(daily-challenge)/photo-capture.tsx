@@ -1,16 +1,13 @@
+import { PhotoResult } from "@folded/types";
 import { router } from "expo-router";
 
 import { PhotoCapture } from "@/components/daily-challenge/photo-capture";
-import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
-import { PhotoResult } from "@folded/types";
 import { View } from "@/components/ui";
+import { useDailyChallengeContext } from "@/hooks/daily-challenge-context";
 
 export default function PhotoCaptureScreen() {
-  const { 
-    completeChallenge, 
-    skipChallenge,
-    isLoading 
-  } = useDailyChallengeContext();
+  const { completeChallenge, skipChallenge, isLoading } =
+    useDailyChallengeContext();
 
   const handlePhotoTaken = async (photo: PhotoResult) => {
     try {
@@ -43,4 +40,4 @@ export default function PhotoCaptureScreen() {
       />
     </View>
   );
-} 
+}

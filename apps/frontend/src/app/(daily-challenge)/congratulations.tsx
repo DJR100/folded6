@@ -15,4 +15,4 @@ export default function CongratulationsScreen() {
       <Congratulations onClose={handleClose} />
     </View>
   );
-} 
+}

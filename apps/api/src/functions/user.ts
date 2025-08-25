@@ -1,6 +1,7 @@
 import { User } from "@folded/types";
-import { beforeUserCreated as beforeUserCreatedCallback } from "firebase-functions/v2/identity";
+import { getAuth } from "firebase-admin/auth";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { beforeUserCreated as beforeUserCreatedCallback } from "firebase-functions/v2/identity";
 
 import { db } from "../common/firebase";
 
@@ -62,7 +63,9 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
     },
   };
 
-  console.log(`✅ Final streak.start being saved: ${user.streak.start} (${new Date(user.streak.start).toISOString()})`);
+  console.log(
+    `✅ Final streak.start being saved: ${user.streak.start} (${new Date(user.streak.start).toISOString()})`,
+  );
 
   // Create or update user document in Firestore
   await db.collection("users").doc(data.uid).set(user);
@@ -71,7 +74,8 @@ export const beforeUserCreated = beforeUserCreatedCallback(async (event) => {
 // Callable: reserve username and set profile fields atomically
 export const reserveUsername = onCall(async (request) => {
   const uid = request.auth?.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "User is not authenticated");
+  if (!uid)
+    throw new HttpsError("unauthenticated", "User is not authenticated");
 
   const { username, firstName } = (request.data || {}) as {
     username?: string;
@@ -114,6 +118,35 @@ export const reserveUsername = onCall(async (request) => {
       { merge: true } as any,
     );
   });
+
+  return { ok: true };
+});
+
+export const deleteAccount = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new HttpsError("unauthenticated", "User is not authenticated");
+  }
+
+  // Read current user doc to get username (if any)
+  const userSnap = await db.collection("users").doc(uid).get();
+  const user = userSnap.data() as any | undefined;
+
+  // 1) Delete user doc
+  await db.collection("users").doc(uid).delete();
+
+  // 2) Release reserved username if owned by this user
+  const username = user?.profile?.username;
+  if (username) {
+    const unameRef = db.collection("usernames").doc(username.toLowerCase());
+    const unameSnap = await unameRef.get();
+    if (unameSnap.exists && (unameSnap.data() as any)?.uid === uid) {
+      await unameRef.delete();
+    }
+  }
+
+  // 3) Delete the Firebase Auth user
+  await getAuth().deleteUser(uid);
 
   return { ok: true };
 });

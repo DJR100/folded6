@@ -1,13 +1,13 @@
 import { FontAwesome } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Octicons from "@expo/vector-icons/Octicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Octicons from "@expo/vector-icons/Octicons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
-import { BlurView } from "expo-blur";
 import { doc, updateDoc } from "@react-native-firebase/firestore";
+import { BlurView } from "expo-blur";
 import React, { useRef, useState } from "react";
-import { Platform, Linking, ScrollView, TouchableOpacity } from "react-native";
+import { Linking, Platform, ScrollView, TouchableOpacity } from "react-native";
 import {
   Camera,
   useCameraDevice,
@@ -71,21 +71,24 @@ export const PanicButton = () => {
   // Calculate current progress for confirmation dialog
   const getCurrentProgress = () => {
     if (!user?.streak?.start) return null;
-    
+
     const streakMs = Date.now() - user.streak.start;
     const days = Math.floor(streakMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((streakMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
+    const hours = Math.floor(
+      (streakMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+
     // Calculate approximate money saved (if available)
     const monthlySaving = user?.demographic?.gambling?.monthlySpend ?? 0;
-    const dailySaving = (typeof monthlySaving === 'number' ? monthlySaving : 0) / 30;
+    const dailySaving =
+      (typeof monthlySaving === "number" ? monthlySaving : 0) / 30;
     const moneySaved = dailySaving * days;
-    
+
     return {
       days,
       hours,
       moneySaved,
-      dailyChallengeStreak: user?.dailyChallenge?.streakCount || 0
+      dailyChallengeStreak: user?.dailyChallenge?.streakCount || 0,
     };
   };
 
@@ -104,22 +107,29 @@ export const PanicButton = () => {
 
   const handleConfirmRelapse = async () => {
     if (!user || isResetting) return;
-    
+
     try {
       setIsResetting(true);
-      
+
       // Reset both streak.start AND daily challenge data
       await updateDoc(doc(db, "users", user.uid), {
         "streak.start": Date.now(),
         "dailyChallenge.streakCount": 0,
         "dailyChallenge.lastCompletedDate": null,
-        "dailyChallenge.currentWeek": [false, false, false, false, false, false, false],
-        "dailyChallenge.currentDayState": "pending"
+        "dailyChallenge.currentWeek": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+        ],
+        "dailyChallenge.currentDayState": "pending",
       });
-      
+
       console.log("🔄 Reset streak and daily challenge data due to relapse");
       relapseConfirmationSheetRef.current?.close();
-      
     } catch (error) {
       console.error("Failed to reset progress:", error);
     } finally {
@@ -135,7 +145,9 @@ export const PanicButton = () => {
     }, 300);
   };
 
-  const handleContactResource = async (resource: typeof CRISIS_RESOURCES[0]) => {
+  const handleContactResource = async (
+    resource: (typeof CRISIS_RESOURCES)[0],
+  ) => {
     try {
       if (resource.phone) {
         if (resource.isText) {
@@ -153,7 +165,7 @@ export const PanicButton = () => {
 
   const renderResourceIcon = (iconName: string) => {
     const iconProps = { size: 24, color: colors.accent };
-    
+
     switch (iconName) {
       case "phone":
         return <FontAwesome name="phone" {...iconProps} />;
@@ -185,7 +197,7 @@ export const PanicButton = () => {
         variant="danger"
         onPress={onClickPanicButton}
       />
-      
+
       {/* Main Panic Button Sheet */}
       <Portal name="bottom-sheet">
         <BottomSheet
@@ -299,11 +311,13 @@ export const PanicButton = () => {
                   Recovery is a journey
                 </Text>
                 <Text className="text-foreground mb-3">
-                  Relapses can be part of recovery. What matters most is getting back on track. 
-                  You're taking responsibility, which shows strength.
+                  Relapses can be part of recovery. What matters most is getting
+                  back on track. You're taking responsibility, which shows
+                  strength.
                 </Text>
                 <Text className="text-foreground">
-                  Consider reaching out for support before resetting your progress.
+                  Consider reaching out for support before resetting your
+                  progress.
                 </Text>
               </View>
 
@@ -313,14 +327,21 @@ export const PanicButton = () => {
                   <Text variant="h3" className="text-danger mb-4">
                     This will reset your progress:
                   </Text>
-                  
+
                   <View className="space-y-3">
                     {/* Recovery Time */}
                     <View className="flex-row items-center">
-                      <FontAwesome name="clock-o" size={20} color={colors.danger} />
+                      <FontAwesome
+                        name="clock-o"
+                        size={20}
+                        color={colors.danger}
+                      />
                       <View className="ml-3">
                         <Text className="text-foreground font-semibold">
-                          Recovery Time: {progress.days > 0 ? `${progress.days} days, ${progress.hours} hours` : `${progress.hours} hours`}
+                          Recovery Time:{" "}
+                          {progress.days > 0
+                            ? `${progress.days} days, ${progress.hours} hours`
+                            : `${progress.hours} hours`}
                         </Text>
                         <Text className="text-foreground/70 text-sm">
                           Will reset to 0
@@ -331,7 +352,11 @@ export const PanicButton = () => {
                     {/* Money Saved */}
                     {progress.moneySaved > 0 && (
                       <View className="flex-row items-center">
-                        <FontAwesome name="dollar" size={20} color={colors.danger} />
+                        <FontAwesome
+                          name="dollar"
+                          size={20}
+                          color={colors.danger}
+                        />
                         <View className="ml-3">
                           <Text className="text-foreground font-semibold">
                             Money Saved: ${progress.moneySaved.toFixed(2)}
@@ -346,10 +371,15 @@ export const PanicButton = () => {
                     {/* Daily Challenge Streak */}
                     {progress.dailyChallengeStreak > 0 && (
                       <View className="flex-row items-center">
-                        <FontAwesome name="fire" size={20} color={colors.danger} />
+                        <FontAwesome
+                          name="fire"
+                          size={20}
+                          color={colors.danger}
+                        />
                         <View className="ml-3">
                           <Text className="text-foreground font-semibold">
-                            Daily Challenge Streak: {progress.dailyChallengeStreak} days
+                            Daily Challenge Streak:{" "}
+                            {progress.dailyChallengeStreak} days
                           </Text>
                           <Text className="text-foreground/70 text-sm">
                             Will reset to 0
@@ -366,7 +396,7 @@ export const PanicButton = () => {
                 <Text variant="h3" className="mb-3">
                   Before you reset, consider:
                 </Text>
-                
+
                 <TouchableOpacity
                   onPress={() => {
                     relapseConfirmationSheetRef.current?.close();
@@ -386,7 +416,11 @@ export const PanicButton = () => {
                         Access crisis resources and helplines
                       </Text>
                     </View>
-                    <FontAwesome name="chevron-right" size={16} color={colors.foreground} />
+                    <FontAwesome
+                      name="chevron-right"
+                      size={16}
+                      color={colors.foreground}
+                    />
                   </View>
                 </TouchableOpacity>
 
@@ -395,7 +429,11 @@ export const PanicButton = () => {
                   className="bg-content2 rounded-xl p-4"
                 >
                   <View className="flex-row items-center">
-                    <FontAwesome name="pause" size={20} color={colors.foreground} />
+                    <FontAwesome
+                      name="pause"
+                      size={20}
+                      color={colors.foreground}
+                    />
                     <View className="ml-3 flex-1">
                       <Text className="text-foreground font-semibold">
                         Take a moment
@@ -414,7 +452,7 @@ export const PanicButton = () => {
               <Text className="text-center text-foreground/70 text-sm mb-4">
                 Only reset if you're certain. This action cannot be undone.
               </Text>
-              
+
               <View className="space-y-6">
                 <Button
                   text={isResetting ? "Resetting..." : "Yes, reset my progress"}
@@ -423,7 +461,7 @@ export const PanicButton = () => {
                   onPress={handleConfirmRelapse}
                 />
                 <View className="mt-4"></View>
-                <Button 
+                <Button
                   text="Cancel"
                   variant="outline"
                   onPress={() => {
@@ -477,23 +515,34 @@ export const PanicButton = () => {
                   Need immediate help?
                 </Text>
                 <Text className="text-foreground mb-3">
-                  If you're having thoughts of suicide or self-harm, please reach out immediately.
+                  If you're having thoughts of suicide or self-harm, please
+                  reach out immediately.
                 </Text>
                 <TouchableOpacity
                   onPress={() => handleContactResource(CRISIS_RESOURCES[0])}
                   className="bg-danger rounded-lg p-3 flex-row items-center justify-center"
                 >
-                  <FontAwesome name="phone" size={18} color="white" className="mr-2" />
-                  <Text className="text-white font-semibold ml-2">Call 988 Now</Text>
+                  <FontAwesome
+                    name="phone"
+                    size={18}
+                    color="white"
+                    className="mr-2"
+                  />
+                  <Text className="text-white font-semibold ml-2">
+                    Call 988 Now
+                  </Text>
                 </TouchableOpacity>
               </View>
 
               {/* Resources List */}
-              <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              <ScrollView
+                className="flex-1"
+                showsVerticalScrollIndicator={false}
+              >
                 <Text variant="h3" className="mb-4">
                   Support Resources
                 </Text>
-                
+
                 {CRISIS_RESOURCES.map((resource, index) => (
                   <TouchableOpacity
                     key={index}
@@ -514,10 +563,10 @@ export const PanicButton = () => {
                         {resource.description}
                       </Text>
                     </View>
-                    <FontAwesome 
-                      name="chevron-right" 
-                      size={16} 
-                      color={colors.foreground} 
+                    <FontAwesome
+                      name="chevron-right"
+                      size={16}
+                      color={colors.foreground}
                     />
                   </TouchableOpacity>
                 ))}
@@ -528,8 +577,9 @@ export const PanicButton = () => {
                     You're not alone
                   </Text>
                   <Text className="text-foreground">
-                    Recovery is a journey, and having urges doesn't mean you've failed. 
-                    These resources are here to support you whenever you need them.
+                    Recovery is a journey, and having urges doesn't mean you've
+                    failed. These resources are here to support you whenever you
+                    need them.
                   </Text>
                 </View>
               </ScrollView>

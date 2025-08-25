@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Text } from "@/components/ui";
+
 import { formatCurrency } from "../lib/format-currency"; // You may need to create this utility or use Intl.NumberFormat
+
+import { Text } from "@/components/ui";
 
 export function MoneySavedTicker({
   usdPerMs,
@@ -10,7 +12,7 @@ export function MoneySavedTicker({
   quitTimestampMs: number;
 }) {
   const [saved, setSaved] = useState(() =>
-    computeSaved(usdPerMs, quitTimestampMs)
+    computeSaved(usdPerMs, quitTimestampMs),
   );
 
   useEffect(() => {

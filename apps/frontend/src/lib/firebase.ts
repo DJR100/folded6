@@ -23,7 +23,7 @@ const firebaseConfig = {
 // }
 // initializeApp(firebaseConfig);
 export const app = getApp();
-export const functions = getFunctions(app);
+export const functions = getFunctions(app, "us-central1");
 export const db = getFirestore(app);
 
 export const api = async (req: {

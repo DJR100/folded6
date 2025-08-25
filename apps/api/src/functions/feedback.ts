@@ -1,10 +1,16 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError, onCall } from "firebase-functions/v2/https";
 import type { CallableRequest } from "firebase-functions/v2/https";
+
 import { db } from "@/common/firebase";
 
 export const submit = onCall(
   { region: "us-central1" }, // match the client
-  async (request: CallableRequest<{ type: "bug" | "general" | "feature"; payload: Record<string, any> }>) => {
+  async (
+    request: CallableRequest<{
+      type: "bug" | "general" | "feature";
+      payload: Record<string, any>;
+    }>,
+  ) => {
     const uid = request.auth?.uid;
     if (!uid) throw new HttpsError("unauthenticated", "Sign-in required");
 
@@ -17,5 +23,5 @@ export const submit = onCall(
     });
 
     return { ok: true };
-  }
+  },
 );

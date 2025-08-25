@@ -1,10 +1,9 @@
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
-import { doc, setDoc } from "@react-native-firebase/firestore";
 
 import { Button, Input, Text, View } from "@/components/ui";
 import { auth, useAuthContext } from "@/hooks/use-auth-context";
-import { db } from "@/lib/firebase";
+import { api } from "@/lib/firebase";
 
 export default function CreateAccountScreen() {
   const { signUp, user } = useAuthContext();
@@ -19,7 +18,9 @@ export default function CreateAccountScreen() {
   return (
     <View className="flex-1 px-4 py-6 gap-8">
       <View className="gap-2">
-        <Text variant="h1" className="text-center">Create your account</Text>
+        <Text variant="h1" className="text-center">
+          Create your account
+        </Text>
         <Text variant="p" className="text-center" muted>
           Join Folded and start your journey today.
         </Text>
@@ -52,40 +53,47 @@ export default function CreateAccountScreen() {
           variant="accent"
           text="Create Account"
           onPress={async () => {
-            await signUp(email.trim(), password);
-            const uid = auth.currentUser?.uid;
-            if (uid) {
-              await setDoc(
-                doc(db, "users", uid),
-                {
-                  uid,
-                  email: email.trim(),
-                  displayName: firstName || username || null,
-                  photoURL: null,
-                  createdAt: Date.now(),
-                  banking: null,
-                  tier: 0,
-                  demographic: {
-                    gender: null,
-                    age: null,
-                    gambling: {
-                      frequency: null,
-                      ageStarted: null,
-                      monthlySpend: null,
-                      estimatedLifetimeLoss: null,
-                    },
-                  },
-                  streak: { start: Date.now() },
-                  message: null,
-                  messaging: { token: null, createdAt: null },
-                  profile: {
-                    username: username || null,
-                    firstName: firstName || null,
-                  },
+            // 1) Create Firebase Auth user (handles email uniqueness)
+            try {
+              await signUp(email.trim(), password);
+            } catch (e: any) {
+              const code: string = e?.code || "";
+              if (code.includes("email-already-in-use")) {
+                alert("This email is already in use. Please sign in instead.");
+              } else if (code.includes("invalid-email")) {
+                alert("Please enter a valid email address.");
+              } else if (code.includes("weak-password")) {
+                alert("Please choose a stronger password.");
+              } else {
+                alert(
+                  e?.message || "Could not create account. Please try again.",
+                );
+              }
+              return;
+            }
+
+            // 2) Reserve username (handles username uniqueness)
+            try {
+              await api({
+                endpoint: "user-reserveUsername",
+                data: {
+                  username: username.trim(),
+                  firstName: firstName.trim() || null,
                 },
-                { merge: true }
-              );
+              });
               router.replace("/onboarding");
+            } catch (e: any) {
+              const code: string = e?.code || ""; // e.g. "functions/already-exists"
+              if (code.includes("already-exists")) {
+                alert(
+                  "That username is already taken. Please try another one.",
+                );
+              } else {
+                alert(
+                  e?.message ||
+                    "Could not reserve username. Please try a different one.",
+                );
+              }
             }
           }}
         />

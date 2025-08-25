@@ -7,36 +7,42 @@ import { DailyChallengeData } from "@folded/types";
 export function initializeRecoveryCounters(existingDays: number) {
   const now = Date.now();
   const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  
+
   // 1. Calculate adjusted start time for bet-free counter
   // Money saved counter will automatically use this timestamp
-  const adjustedStartTime = now - (existingDays * millisecondsPerDay);
-  
+  const adjustedStartTime = now - existingDays * millisecondsPerDay;
+
   // 🔍 DEBUG: Log the calculation details
-  console.log('🔧 Recovery Counter Initialization Debug:');
+  console.log("🔧 Recovery Counter Initialization Debug:");
   console.log(`  📅 Existing days: ${existingDays}`);
-  console.log(`  ⏰ Current timestamp: ${now} (${new Date(now).toISOString()})`);
-  console.log(`  ⏰ Adjusted start time: ${adjustedStartTime} (${new Date(adjustedStartTime).toISOString()})`);
-  console.log(`  📊 Days difference: ${(now - adjustedStartTime) / millisecondsPerDay}`);
-  
+  console.log(
+    `  ⏰ Current timestamp: ${now} (${new Date(now).toISOString()})`,
+  );
+  console.log(
+    `  ⏰ Adjusted start time: ${adjustedStartTime} (${new Date(adjustedStartTime).toISOString()})`,
+  );
+  console.log(
+    `  📊 Days difference: ${(now - adjustedStartTime) / millisecondsPerDay}`,
+  );
+
   // 2. Initialize daily challenge data to match recovery streak
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(23, 59, 59, 999); // End of day
-  
+
   const dailyChallengeData: DailyChallengeData = {
     streakCount: existingDays, // Match their recovery streak
     lastCompletedDate: existingDays > 0 ? yesterday.toISOString() : null,
     lastAppOpenDate: null, // Will be set when they first open app
     currentWeek: [false, false, false, false, false, false, false], // Fresh week
-    currentDayState: "pending" // Ready for today's challenge
+    currentDayState: "pending", // Ready for today's challenge
   };
-  
-  console.log('🎯 Daily Challenge Data:', dailyChallengeData);
-  
+
+  console.log("🎯 Daily Challenge Data:", dailyChallengeData);
+
   return {
     streakStart: adjustedStartTime,
     dailyChallenge: dailyChallengeData,
-    existingRecoveryDays: existingDays
+    existingRecoveryDays: existingDays,
   };
-} 
+}
