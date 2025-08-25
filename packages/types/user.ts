@@ -19,7 +19,7 @@ export interface User {
     gender: "male" | "female" | "non-binary" | null;
     age: Range | null; //Age range
     gambling: {
-      frequency: "daily" | "weekly" | "monthly" | null;
+      frequency: "multiple-times-a-day" | "daily" | "weekly" | "monthly" | null;
       ageStarted: Range | null;
       monthlySpend: Range | null;
       estimatedLifetimeLoss: number | null;

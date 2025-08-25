@@ -2,12 +2,17 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import * as Application from "expo-application";
 import React, { useState } from "react";
-import { Switch, TouchableOpacity } from "react-native";
+import { Platform, Switch, TouchableOpacity, Linking } from "react-native";
 
 import { Text, View } from "@/components/ui";
+import { useAuthContext } from "@/hooks/use-auth-context";
 
 const FEEDBACK_URL = "https://forms.gle/7nmUPk3wC15mmL4p8";
+const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/GAQVvOphcG1BZEJOg636n6";
+const SUPPORT_EMAIL = "me@dillonroberts.co.uk";
+const SUPPORT_SUBJECT = "Folded App Support";
 
 // helper chevron
 const ChevronRight = () => (
@@ -16,6 +21,7 @@ const ChevronRight = () => (
 
 export default function SettingsRoot() {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
+  const { user } = useAuthContext();
 
   return (
     <View className="flex-1 bg-background">
@@ -41,7 +47,9 @@ export default function SettingsRoot() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity className="bg-white/5 rounded-xl px-4 py-4 mb-3">
+        <TouchableOpacity className="bg-white/5 rounded-xl px-4 py-4 mb-3"
+        onPress={() => WebBrowser.openBrowserAsync(WHATSAPP_GROUP_URL)}
+        >
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
               <Feather name="message-square" size={16} color="white" />
@@ -64,7 +72,18 @@ export default function SettingsRoot() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity className="bg-white/5 rounded-xl px-4 py-4 mb-6">
+        <TouchableOpacity
+          className="bg-white/5 rounded-xl px-4 py-4 mb-6"
+          onPress={async () => {
+            const body = `\n\n----- DO NOT REMOVE DEBUG INFO -----\n\nUser ID: ${user?.uid ?? "-"}\nPlatform: ${Platform.OS}\nApp Version: ${Application.nativeApplicationVersion ?? "-"}\n\n`;
+            const mailtoUrl = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
+              SUPPORT_SUBJECT,
+            )}&body=${encodeURIComponent(body)}`;
+            try {
+              await Linking.openURL(mailtoUrl);
+            } catch {}
+          }}
+        >
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
               <Feather name="send" size={16} color="white" />

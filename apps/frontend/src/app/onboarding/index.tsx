@@ -44,6 +44,7 @@ const stages: OnboardingFormStage[] = [
   {
     title: "How often do you gamble?",
     options: [
+      { value: "multiple-times-a-day", label: "Multiple times a day" },
       { value: "daily", label: "Once a day" },
       { value: "weekly", label: "Once a week" },
       { value: "monthly", label: "Once a month" },
