@@ -38,19 +38,6 @@ export default function DashboardLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "Profile",
-            tabBarIcon: ({ focused }) => (
-              <FontAwesome
-                name="user"
-                size={24}
-                color={focused ? colors.accent : colors.foreground}
-              />
-            ),
-          }}
-        />
         {/** Settings moved to modal in dashboard/index; bottom-tab entry removed */}
       </Tabs>
     </DailyChallengeProvider>
