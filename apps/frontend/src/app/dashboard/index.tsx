@@ -16,6 +16,7 @@ import {
 } from "@/hooks/daily-challenge-context";
 import { useAuthContext } from "@/hooks/use-auth-context";
 import { cn } from "@/lib/cn";
+import BetFreeTimer from "@/components/BetFreeTimer";
 
 const ProfileHeaderInline = React.memo(function ProfileHeaderInline() {
   const { user } = useAuthContext();
@@ -218,23 +219,12 @@ function DashboardContent() {
           <ProfileHeaderInline />
 
           <View className="flex flex-col gap-2 items-center">
-            <Text className="text-base font-medium">Bet Free:</Text>
-            {/* Streak duration */}
-            <View className="flex flex-row gap-4 items-baseline">
-              <View className="flex flex-row gap-1 items-baseline">
-                <Text variant="h1">{streak.major.value}</Text>
-                <Text>{streak.major.units}</Text>
-              </View>
-              <View className="flex flex-row gap-1 items-baseline">
-                <Text
-                  variant="h1"
-                  className={cn(!streak.minor.units && "min-w-[48px]")}
-                >
-                  {streak.minor.value}
-                </Text>
-                <Text>{streak.minor.units}</Text>
-              </View>
-            </View>
+            {(user?.tier ?? 0) > 0 && (
+              <>
+                <Text className="text-base font-medium">Bet Free:</Text>
+                <BetFreeTimer startTimestampMs={user?.streak?.start ?? null} />
+              </>
+            )}
             {/* Money Saved Ticker */}
             {usdPerMs && quitTimestampMs && (
               <View className="mt-1 items-center">
