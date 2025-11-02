@@ -7,19 +7,31 @@ const Face = ({
   name,
   streak,
   src,
+  scale = 1,
 }: {
   name: string;
   streak: number;
   src: string;
-}) => (
-  <View className="flex flex-col items-center gap-1">
-    <Image source={src} style={{ width: 120, height: 120, borderRadius: 70 }} />
-    <View className="flex flex-col">
-      <Text className="text-center font-bold">{name}</Text>
+  scale?: number;
+}) => {
+  const size = 120 * scale;
+  const borderRadius = 70 * scale;
 
-      <Streak streak={streak} />
+  return (
+    <View className="flex flex-col items-center gap-1">
+      <Image
+        source={src}
+        style={{ width: size, height: size, borderRadius: borderRadius }}
+      />
+      <View className="flex flex-col">
+        <Text className="text-center font-bold" style={{ fontSize: 14 * scale }}>
+          {name}
+        </Text>
+
+        <Streak streak={streak} scale={scale} />
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 export default Face;
